@@ -135,7 +135,7 @@ async def on_message(message):
                     print(r)
                     await client.send_message(message.channel, r)
     # a lil hint message
-    if message.content.lower().contains("good flirt"):
+    if message.content.lower().find("good flirt") != -1:
         await client.send_message(message.channel, "Well hello, is sombody blushing? Maybe it's time to give someone some points ;)"%args[0])
 
 client.run("Mzk1MTU0ODc5NzAzNjc4OTc3.DSO0Fw.KVo8P42u9GeBB_RLBZ2dQGnEvKw")
