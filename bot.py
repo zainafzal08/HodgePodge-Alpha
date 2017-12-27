@@ -41,6 +41,7 @@ def command(channel, args):
         return res
     elif args[0] == "kill" and len(args)>1:
         phrase = " ".join(args[1:])
+        print("KILL: "+phrase)
         c.execute("SELECT * FROM PHRASES WHERE TRIGGER = ?",(phrase,))
         if c.fetchone() != None:
             c.execute("DELETE FROM PHRASES WHERE TRIGGER = ?", (phrase,))
@@ -102,9 +103,9 @@ async def on_message(message):
         pairs.append((row[1],row[2]))
         row = c.fetchone()
     for pair in pairs:
-        print("Searching for ["+pair[0]+"]")
+        print("Searching for ["+str(pair[0])+"]")
         if message.content.lower().find(str(pair[0])) != -1:
-           await client.send_message(message.channel, pair[1])
+           await client.send_message(message.channel, str(pair[1]))
            
 
 client.run("Mzk1MzgyNzA0OTYwNzAwNDE2.DSSITw.Te0v0ti0k_xkpxG-vxqm-tKQVZs")
