@@ -125,7 +125,7 @@ async def on_message(message):
                 await client.send_message(message.channel, "Sorry i'm a bit confused as to what you mean, the command is !ft reward <person> <amount>")
                 return
             if res["err"] == 1:
-                await client.send_message(message.channel, "Sorry! I don't know who %s is, Perhaps try doing !ft register %s :)"%args[0])
+                await client.send_message(message.channel, "Sorry! I don't know who %s is, Perhaps try doing !ft register %s :)"%(args[0],args[0]))
             elif res["err"] == 2:
                 await client.send_message(message.channel, "Sorry! Flirt points must be simple integers!")
             else:
@@ -137,7 +137,7 @@ async def on_message(message):
                 await client.send_message(message.channel, "Sorry i'm a bit confused as to what you mean, the command is !ft punish <person> <amount>")
                 return
             if res["err"] == 1:
-                await client.send_message(message.channel, "Sorry! I don't know who %s is, Perhaps try doing !ft register %s :)"%args[0])
+                await client.send_message(message.channel, "Sorry! I don't know who %s is, Perhaps try doing !ft register %s :)"%(args[0],args[0]))
             elif res["err"] == 2:
                 await client.send_message(message.channel, "Sorry! Flirt points must be simple integers!")
             else:
