@@ -1,11 +1,11 @@
 import discord
 import asyncio
-import database
+from dbInterface import Database
 
 # Globals
 client = discord.Client()
 commands = [("list", listCommand),("on", regisetCommand),("kill", killCommand),("help",helpCommand)]
-
+database = Database('data.db')
 # commands
 
 def newResultObject():
@@ -35,11 +35,11 @@ def killCommand(channel, arg):
         res["err"] = True
         res["errMsg"] = "I may be a genius but i'm not psychic, you need to tell me what phrase to kill"
         return res
-    elif not database.containsTrigger(channel, phrase):
+    elif not database.containsTrigger(channel, arg):
         res["err"] = True
         res["errMsg"] = "I haven't been told to keep track of that phrase, perhaps try to use your brain at more then 1\% power?"
         return res
-    database.deletePhrase(channel, phrase)
+    database.deletePhrase(channel, arg)
     res["response"] = "I won't mention the phrase again, but it will *always* be in my databanks along with everything else"
     return res
 
@@ -123,7 +123,6 @@ def triggerResponse(message):
             output.append(phrase[1])
     if len(output) > 0:
         client.send_message(message.channel, "\n".join(output))
-
 
 @client.event
 async def on_ready():
