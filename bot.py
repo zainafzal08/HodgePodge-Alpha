@@ -1,71 +1,129 @@
 import discord
 import asyncio
-import sqlite3
+import database
 
+# Globals
 client = discord.Client()
+commands = [("list", listCommand),("on", regisetCommand),("kill", killCommand),("help",helpCommand)]
 
+# commands
 
-def argError():
-    message = "*Flames Shoot out of the floor* :: Not enough/bad arguments!"
-    return message
-
-def command(channel, args):
-    conn = sqlite3.connect('data.db')
-    c = conn.cursor()
+def newResultObject():
     res = {}
-    res["data"] = None
-    res["status"] = 0
-    if args[0] == "on" and "say" in args:
-        say = ""
-        on = ""
-        i = len(args)-1
-        if args[i] == "say":
-            conn.close()
-            res["status"] = 1
-            return res
-        while args[i] != "say":
-            say = args[i] + " " + say
-            i-=1
+    res["err"] = False
+    res["errMsg"] = ""
+    res["output"] = False
+    res["outputMsg"] = []
+    res["response"] = "Noted."
+    return res
+
+def listCommand(channel, arg):
+    phrases = database.allPhrases(channel)
+    res = newResultObject()
+    res["output"] = True
+    raw = []
+    raw.append("Trigger                    | Response                    ")
+    raw.append("=========================================================")
+    for phrase in phrases:
+        raw.append(phrase[0]+.ljust(20)+"|"+phrase[1].ljust(10))
+    res["outputMsg"].append("\n".join(raw))
+    return res
+
+def killCommand(channel, arg):
+    res = newResultObject()
+    if len(arg.strip()) == 0:
+        res["err"] = True
+        res["errMsg"] = "I may be a genius but i'm not psychic, you need to tell me what phrase to kill"
+        return res
+    elif not database.containsTrigger(channel, phrase):
+        res["err"] = True
+        res["errMsg"] = "I haven't been told to keep track of that phrase, perhaps try to use your brain at more then 1\% power?"
+        return res
+    database.deletePhrase(channel, phrase)
+    res["response"] = "I won't mention the phrase again, but it will *always* be in my databanks along with everything else"
+    return res
+
+def helpCommand(channel, arg):
+    res = newResultObject()
+    res["output"] = True
+    raw = []
+    raw.append("Command                    | Action                      ")
+    raw.append("=========================================================")
+    raw.append("!hodge list                | lists all phrases hodge is  ")
+    raw.append("                           | keeping track of            ")
+    raw.append("---------------------------------------------------------")
+    raw.append("!hodge kill <phrase>       | removes a phrase from hodges")
+    raw.append("                           | database                    ")
+    raw.append("---------------------------------------------------------")
+    raw.append("!hodge help                | displays this message       ")
+    raw.append("---------------------------------------------------------")
+    raw.append("!hodge on <t> say <s>      | tells hodge to say <s>      ")
+    raw.append("                           | whenever <t> is mentioned   ")
+    raw.append("=========================================================")
+    res["outputMsg"].append("\n".join(raw))
+    return res
+
+def regiserCommand(channel, arg):
+    args = arg.split(" ")
+    res = newResultObject()
+    if args[-1] == "say" or "say" not in args:
+        res["err"] = True
+        res["errMsg"] = "You don't register as a child but your responses suggest otherwise, you have to give both a trigger AND a response phrase. !hodge on <trigger> say <response>"
+        return res
+    i = len(args)-1
+    while args[i] != "say":
+        say = args[i] + " " + say
         i-=1
-        while args[i] != "on":
-            on = args[i] + " "+on
-            i-=1
-        say = say.strip()
-        on = on.strip()
-        c.execute("SELECT * FROM PHRASES WHERE TRIGGER = ?",(on,))
-        if(c.fetchone() != None):
-            conn.close()
-            res["status"] = 2
-            return res
-        c.execute("INSERT INTO PHRASES VALUES (?,?,?)", (channel, on, say))
-        conn.commit()
-        conn.close()
-        return res
-    elif args[0] == "kill" and len(args)>1:
-        phrase = (" ".join(args[1:])).strip()
-        c.execute("SELECT * FROM PHRASES WHERE TRIGGER = ?",(phrase,))
-        if c.fetchone() != None:
-            c.execute("DELETE FROM PHRASES WHERE TRIGGER = ?", (phrase,))
-        else:
-            conn.close()
-            res["status"] = 1
-            return res
-        conn.commit()
-        conn.close()
-        return res
-    elif args[0] == "list":
-        res["status"] = 3
-        res["data"] = []
-        c.execute("SELECT * FROM PHRASES WHERE CHANNEL_ID = ?",(channel,))
-        row = c.fetchone()
-        while row != None:
-            res["data"].append(str(row[1])+" -> "+str(row[2]))
-            row = c.fetchone()
-        return res
+    on = " ".join(args[:i])
+    say = say.strip()
+    on = on.strip()
+    database.newPhrase(channel, on, say)
+    return res
+
+# Messagae Interperting Functions
+
+def isCommand(message):
+    m = message.content.lower()
+    args = m.split(" ")
+    if len(args) < 2:
+        return False
+    if args[0] != "!hodge":
+        return False
+    if args[1] not in commands:
+        return False
+    if not message.author.permissions_in(message.channel).administrator:
+        return False
+    return True
+
+def runCommand(message):
+    m = message.content.lower()
+    c = m.split(" ")[1]
+    arg = " ".join(m.split(" ")[2:])
+    res = commands[c][1](message.channel.id, arg)
+    if res["err"]:
+        client.send_message(message.channel, res["errMsg"])
+    elif res["output"]:
+        for line in res["outputMsg"]:
+            client.send_message(message.channel, line)
     else:
-        conn.close()
-        res["status"] = 1
-        return res
+        client.send_message(message.channel, res["response"])
+
+def isQuestion(message):
+    return False
+
+def answerQuestion(message):
+    return None
+
+def triggerResponse(message):
+    phrases = database.allPhrases(channel)
+    m = message.content.lower()
+    output = []
+    for phrase in phrases:
+        if m.find(phrase[0]) != -1:
+            output.append(phrase[1])
+    if len(output) > 0:
+        client.send_message(message.channel, "\n".join(output))
+
 
 @client.event
 async def on_ready():
@@ -75,38 +133,19 @@ async def on_ready():
     print('------')
     print(client)
 
-
 @client.event
 async def on_message(message):
     # ignore bots
     if(message.author.bot):
         return
-    m = message.content.lower().split(" ")
-    if len(m) > 1 and m[0] == "!hodge" and message.author.permissions_in(message.channel).administrator:
-        res = command(message.channel.id, m[1:])
-        if res["status"] == 1:
-            await client.send_message(message.channel, argError())
-        elif res["status"] == 2:
-            await client.send_message(message.channel, "I already have a phrase for that! You have to kill it first before replacing it.")
-        elif res["status"] == 3:
-            for line in res["data"]:
-                await client.send_message(message.channel, line)   
-        else:
-            await client.send_message(message.channel, "Got it!")
-    elif len(m) == 1 and m[0] == "!hodge":
-        await client.send_message(message.channel, argError())
-    conn = sqlite3.connect('data.db')
-    c = conn.cursor()
-    c.execute("SELECT * FROM PHRASES WHERE CHANNEL_ID = ?",(message.channel.id,))
-    pairs = []
-    row = c.fetchone()
-    while row != None:
-        pairs.append((row[1],row[2]))
-        row = c.fetchone()
-    for pair in pairs:
-        if message.content.lower().find(str(pair[0])) != -1:
-           await client.send_message(message.channel, str(pair[1]))
-           
+    # attempt admin command parsing
+    if isCommand(message):
+        runCommand(message)
+    # attempt question answering
+    elif isQuestion(message):
+        answerQuestion(message)
+    # attempt to respond to triggers
+    triggerResponse(message)
 
 client.run("Mzk1MzgyNzA0OTYwNzAwNDE2.DSSITw.Te0v0ti0k_xkpxG-vxqm-tKQVZs")
 client.close()
