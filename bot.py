@@ -30,6 +30,8 @@ def command(channel, args):
         while args[i] != "on":
             on = args[i] + " "+on
             i-=1
+        say = say.strip()
+        on = on.strip()
         c.execute("SELECT * FROM PHRASES WHERE TRIGGER = ?",(on,))
         if(c.fetchone() != None):
             conn.close()
@@ -40,8 +42,7 @@ def command(channel, args):
         conn.close()
         return res
     elif args[0] == "kill" and len(args)>1:
-        phrase = " ".join(args[1:])
-        print("KILL: "+phrase)
+        phrase = (" ".join(args[1:])).strip()
         c.execute("SELECT * FROM PHRASES WHERE TRIGGER = ?",(phrase,))
         if c.fetchone() != None:
             c.execute("DELETE FROM PHRASES WHERE TRIGGER = ?", (phrase,))
