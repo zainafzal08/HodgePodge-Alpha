@@ -18,6 +18,7 @@ def register(channel, name):
         return res;
     c.execute("INSERT INTO USERS VALUES (?,?,?)", (channel, name, 0))
     conn.commit()
+    conn.close()
     return res
 
 # result.err = 1 if wrong name
@@ -43,6 +44,7 @@ def reward(channel, name, amount):
     newPoints = val + row[2]
     c.execute("UPDATE USERS SET POINTS = ? WHERE NAME = ? AND CHANNEL_ID = ?", (newPoints,name, channel))
     conn.commit()
+    conn.close()
     res["new"] = newPoints
     return res
 # result.err = 1 if wrong name
@@ -68,6 +70,7 @@ def punish(channel, name, amount):
     newPoints = row[2] - val
     c.execute("UPDATE USERS SET POINTS = ? WHERE NAME = ? AND CHANNEL_ID = ?", (newPoints,name, channel))
     conn.commit()
+    conn.close()
     res["new"] = newPoints
     return res
 
@@ -87,6 +90,7 @@ def status(channel):
     while row != None:
         res["data"].append("%s [%d]"%(row[1],row[2]))
         row = c.fetchone()
+    conn.close()
     return res
 
 @client.event
@@ -129,7 +133,7 @@ async def on_message(message):
         elif c == "status":
             res = status(message.channel.id)
             if res["err"] == 1:
-                await client.send_message(message.channel, "Sorry i don't know anyone in this channel yet! Perhaps try doing !ft register :)"%args[0])
+                await client.send_message(message.channel, "Sorry i don't know anyone in this channel yet! Perhaps try doing !ft register :)")
             else:
                 for r in res["data"]:
                     print(r)
