@@ -82,7 +82,7 @@ async def on_message(message):
     if(message.author.bot):
         return
     m = message.content.lower().split(" ")
-    if len(m) > 1 and m[0] == "!hodge" and discord.permissions_in(message.channel).administrator:
+    if len(m) > 1 and m[0] == "!hodge" and message.author.permissions_in(message.channel).administrator:
         res = command(message.channel.id, m[1:])
         if res["status"] == 1:
             await client.send_message(message.channel, argError())
