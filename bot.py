@@ -102,6 +102,7 @@ async def on_message(message):
         pairs.append((row[1],row[2]))
         row = c.fetchone()
     for pair in pairs:
+        print("Searching for ["+pair[0]+"]")
         if message.content.lower().find(str(pair[0])) != -1:
            await client.send_message(message.channel, pair[1])
            
