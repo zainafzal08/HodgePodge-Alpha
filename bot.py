@@ -109,13 +109,21 @@ async def on_message(message):
         c = m[1]
         args = m[2:]
         if c == "register":
-            res = register(message.channel.id,args[0])
+            try:
+                res = register(message.channel.id,args[0])
+            except:
+                await client.send_message(message.channel, "Sorry! Something went wrong :/")
+                return
             if res["err"] == 1:
                 await client.send_message(message.channel, "I already know who %s is silly!"%args[0])
             else:
                 await client.send_message(message.channel, "Welcome %s! You have 0 Points, get to flirting :D"%args[0])
         elif c == "reward":
-            res = reward(message.channel.id,args[0],args[1])
+            try:
+                res = reward(message.channel.id,args[0],args[1])
+            except:
+                await client.send_message(message.channel, "Sorry i'm a bit confused as to what you mean, the command is !ft reward <person> <amount>")
+                return
             if res["err"] == 1:
                 await client.send_message(message.channel, "Sorry! I don't know who %s is, Perhaps try doing !ft register %s :)"%args[0])
             elif res["err"] == 2:
@@ -123,7 +131,11 @@ async def on_message(message):
             else:
                 await client.send_message(message.channel, "%s is now at %d flirt points!"%(args[0],res["new"]))
         elif c == "punish":
-            res = punish(message.channel.id,args[0],args[1])
+            try:
+                res = punish(message.channel.id,args[0],args[1])
+            except:
+                await client.send_message(message.channel, "Sorry i'm a bit confused as to what you mean, the command is !ft punish <person> <amount>")
+                return
             if res["err"] == 1:
                 await client.send_message(message.channel, "Sorry! I don't know who %s is, Perhaps try doing !ft register %s :)"%args[0])
             elif res["err"] == 2:
@@ -131,13 +143,19 @@ async def on_message(message):
             else:
                 await client.send_message(message.channel, "%s is now at %d flirt points :("%(args[0],res["new"]))
         elif c == "status":
-            res = status(message.channel.id)
+            try:
+                res = status(message.channel.id)
+            except:
+                await client.send_message(message.channel, "Sorry! Something went wrong :/")
+                return
             if res["err"] == 1:
                 await client.send_message(message.channel, "Sorry i don't know anyone in this channel yet! Perhaps try doing !ft register :)")
             else:
                 for r in res["data"]:
                     print(r)
                     await client.send_message(message.channel, r)
+        else:
+            await client.send_message(message.channel, "Sorry! i don't know that command :(")
     # a lil hint message
     if message.content.lower().find("good flirt") != -1:
         await client.send_message(message.channel, "Well hello, is sombody blushing? Maybe it's time to give someone some points ;)")
