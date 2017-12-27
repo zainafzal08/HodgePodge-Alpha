@@ -14,7 +14,7 @@ class Database():
 
     def allPhrases(self, channel):
         self.c.execute("SELECT * FROM PHRASES WHERE CHANNEL_ID = ?",(channel,))
-        row = c.fetchone()
+        row = self.c.fetchone()
         res = []
         while row != None:
             res.append((str(row[1]).strip(),str(row[2]).strip()))
@@ -26,5 +26,5 @@ class Database():
         self.conn.commit()
 
     def newPhrase(self, channel, phrase, response):
-        self.c.execute("INSERT INTO PHRASES VALUES (?,?,?)", (channel, on, say))
+        self.c.execute("INSERT INTO PHRASES VALUES (?,?,?)", (channel, phrase, response))
         self.conn.commit()

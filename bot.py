@@ -4,8 +4,8 @@ from dbInterface import Database
 
 # Globals
 client = discord.Client()
-commands = [("list", listCommand),("on", regisetCommand),("kill", killCommand),("help",helpCommand)]
 database = Database('data.db')
+commands = []
 # commands
 
 def newResultObject():
@@ -22,10 +22,12 @@ def listCommand(channel, arg):
     res = newResultObject()
     res["output"] = True
     raw = []
+    raw.append("```")
     raw.append("Trigger                    | Response                    ")
     raw.append("=========================================================")
+    raw.append("```")
     for phrase in phrases:
-        raw.append(phrase[0]+.ljust(20)+"|"+phrase[1].ljust(10))
+        raw.append(phrase[0].ljust(20)+"|"+phrase[1].ljust(10))
     res["outputMsg"].append("\n".join(raw))
     return res
 
@@ -47,6 +49,7 @@ def helpCommand(channel, arg):
     res = newResultObject()
     res["output"] = True
     raw = []
+    raw.append("```")
     raw.append("Command                    | Action                      ")
     raw.append("=========================================================")
     raw.append("!hodge list                | lists all phrases hodge is  ")
@@ -60,6 +63,7 @@ def helpCommand(channel, arg):
     raw.append("!hodge on <t> say <s>      | tells hodge to say <s>      ")
     raw.append("                           | whenever <t> is mentioned   ")
     raw.append("=========================================================")
+    raw.append("```")
     res["outputMsg"].append("\n".join(raw))
     return res
 
@@ -71,6 +75,8 @@ def regiserCommand(channel, arg):
         res["errMsg"] = "You don't register as a child but your responses suggest otherwise, you have to give both a trigger AND a response phrase. !hodge on <trigger> say <response>"
         return res
     i = len(args)-1
+    say = ""
+    on = ""
     while args[i] != "say":
         say = args[i] + " " + say
         i-=1
@@ -82,50 +88,57 @@ def regiserCommand(channel, arg):
 
 # Messagae Interperting Functions
 
-def isCommand(message):
+async def isCommand(message):
     m = message.content.lower()
     args = m.split(" ")
     if len(args) < 2:
         return False
     if args[0] != "!hodge":
         return False
-    if args[1] not in commands:
+    if args[1] not in list(map(lambda x: x[0],commands)):
         return False
     if not message.author.permissions_in(message.channel).administrator:
         return False
     return True
 
-def runCommand(message):
+async def runCommand(message):
     m = message.content.lower()
     c = m.split(" ")[1]
     arg = " ".join(m.split(" ")[2:])
-    res = commands[c][1](message.channel.id, arg)
+    i = list(map(lambda x: x[0],commands)).index(c)
+    res = commands[i][1](message.channel.id, arg)
     if res["err"]:
-        client.send_message(message.channel, res["errMsg"])
+        await client.send_message(message.channel, res["errMsg"])
     elif res["output"]:
         for line in res["outputMsg"]:
-            client.send_message(message.channel, line)
+            await client.send_message(message.channel, line)
     else:
-        client.send_message(message.channel, res["response"])
+        await client.send_message(message.channel, res["response"])
 
-def isQuestion(message):
+async def isQuestion(message):
     return False
 
-def answerQuestion(message):
+async def answerQuestion(message):
     return None
 
-def triggerResponse(message):
-    phrases = database.allPhrases(channel)
+async  def triggerResponse(message):
+    phrases = database.allPhrases(message.channel.id)
     m = message.content.lower()
     output = []
     for phrase in phrases:
         if m.find(phrase[0]) != -1:
             output.append(phrase[1])
     if len(output) > 0:
-        client.send_message(message.channel, "\n".join(output))
+        await client.send_message(message.channel, "\n".join(output))
 
+
+# Discord event handlers
 @client.event
 async def on_ready():
+    commands.append(("list", listCommand))
+    commands.append(("on", regiserCommand))
+    commands.append(("kill", killCommand))
+    commands.append(("help",helpCommand))
     print('Logged in as')
     print(client.user.name)
     print(client.user.id)
@@ -138,13 +151,13 @@ async def on_message(message):
     if(message.author.bot):
         return
     # attempt admin command parsing
-    if isCommand(message):
-        runCommand(message)
+    if await isCommand(message):
+        await runCommand(message)
     # attempt question answering
-    elif isQuestion(message):
-        answerQuestion(message)
+    elif await isQuestion(message):
+        await answerQuestion(message)
     # attempt to respond to triggers
-    triggerResponse(message)
+    await triggerResponse(message)
 
 client.run("Mzk1MzgyNzA0OTYwNzAwNDE2.DSSITw.Te0v0ti0k_xkpxG-vxqm-tKQVZs")
 client.close()
