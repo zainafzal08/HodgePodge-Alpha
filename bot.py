@@ -4,94 +4,66 @@ import sqlite3
 
 client = discord.Client()
 
-# Helper Functions
 
-# result.err = 1 if name exists
-def register(channel, name):
-    res = {}
-    res["err"] = 0
-    conn = sqlite3.connect('data.db')
-    c = conn.cursor()
-    c.execute('SELECT * FROM USERS WHERE CHANNEL_ID=? AND NAME=?', (channel, name))
-    if c.fetchone() != None:
-        res["err"] = 1
-        return res;
-    c.execute("INSERT INTO USERS VALUES (?,?,?)", (channel, name, 0))
-    conn.commit()
-    conn.close()
-    return res
+def argError():
+    message = "*Flames Shoot out of the floor* :: Not enough/bad arguments!"
+    return message
 
-# result.err = 1 if wrong name
-# result.err = 2 if wrong value
-# result.new = new flirt point val
-def reward(channel, name, amount):
+def command(channel, args):
     conn = sqlite3.connect('data.db')
     c = conn.cursor()
     res = {}
-    res["err"] = 0
-    res["new"] = None
-    c.execute('SELECT * FROM USERS WHERE CHANNEL_ID=? AND NAME=?', (channel, name))
-    row = c.fetchone()
-    if row == None:
-        res["err"] = 1
-        return res;
-    val = None
-    try:
-        val = int(amount)
-    except:
-        res["err"] = 2
-        return res;
-    newPoints = val + row[2]
-    c.execute("UPDATE USERS SET POINTS = ? WHERE NAME = ? AND CHANNEL_ID = ?", (newPoints,name, channel))
-    conn.commit()
-    conn.close()
-    res["new"] = newPoints
-    return res
-# result.err = 1 if wrong name
-# result.err = 2 if wrong value
-# result.new = new flirt point val
-def punish(channel, name, amount):
-    conn = sqlite3.connect('data.db')
-    c = conn.cursor()
-    res = {}
-    res["err"] = 0
-    res["new"] = None
-    c.execute('SELECT * FROM USERS WHERE CHANNEL_ID=? AND NAME=?', (channel, name))
-    row = c.fetchone()
-    if row == None:
-        res["err"] = 1
-        return res;
-    val = None
-    try:
-        val = int(amount)
-    except:
-        res["err"] = 2
-        return res;
-    newPoints = row[2] - val
-    c.execute("UPDATE USERS SET POINTS = ? WHERE NAME = ? AND CHANNEL_ID = ?", (newPoints,name, channel))
-    conn.commit()
-    conn.close()
-    res["new"] = newPoints
-    return res
-
-# result.err = 1 if no names
-# result.data = array of printable stats
-def status(channel):
-    conn = sqlite3.connect('data.db')
-    c = conn.cursor()
-    res = {}
-    res["err"] = 0
-    res["data"] = []
-    c.execute('SELECT * FROM USERS WHERE CHANNEL_ID = ?', (channel,))
-    row = c.fetchone()
-    if row == None:
-        res["err"] = 1
+    res["data"] = None
+    res["status"] = 0
+    if args[0] == "on" and "say" in args:
+        say = ""
+        on = ""
+        i = len(args)-1
+        if args[i] == "say":
+            conn.close()
+            res["status"] = 1
+            return res
+        while args[i] != "say":
+            say = args[i] + " " + say
+            i-=1
+        i-=1
+        while args[i] != "on":
+            on = args[i] + " "+on
+            i-=1
+        c.execute("SELECT * FROM PHRASES WHERE TRIGGER = ?",(on,))
+        if(c.fetchone() != None):
+            conn.close()
+            res["status"] = 2
+            return res
+        c.execute("INSERT INTO PHRASES VALUES (?,?,?)", (channel, on, say))
+        conn.commit()
+        conn.close()
         return res
-    while row != None:
-        res["data"].append("%s [%d]"%(row[1],row[2]))
+    elif args[0] == "kill" and len(args)>1:
+        phrase = " ".join(args[1:])
+        c.execute("SELECT * FROM PHRASES WHERE TRIGGER = ?",(phrase,))
+        if c.fetchone() != None:
+            c.execute("DELETE FROM PHRASES WHERE TRIGGER = ?", (phrase,))
+        else:
+            conn.close()
+            res["status"] = 1
+            return res
+        conn.commit()
+        conn.close()
+        return res
+    elif args[0] == "list":
+        res["status"] = 3
+        res["data"] = []
+        c.execute("SELECT * FROM PHRASES WHERE CHANNEL_ID = ?",(channel,))
         row = c.fetchone()
-    conn.close()
-    return res
+        while row != None:
+            res["data"].append(str(row[1])+" -> "+str(row[2]))
+            row = c.fetchone()
+        return res
+    else:
+        conn.close()
+        res["status"] = 1
+        return res
 
 @client.event
 async def on_ready():
@@ -104,61 +76,35 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    m = message.content.split(" ")
-    if m[0] == "!ft" and len(m) > 1:
-        c = m[1]
-        args = m[2:]
-        if c == "register":
-            try:
-                res = register(message.channel.id,args[0])
-            except:
-                await client.send_message(message.channel, "Sorry! Something went wrong :/")
-                return
-            if res["err"] == 1:
-                await client.send_message(message.channel, "I already know who %s is silly!"%args[0])
-            else:
-                await client.send_message(message.channel, "Welcome %s! You have 0 Points, get to flirting :D"%args[0])
-        elif c == "reward":
-            try:
-                res = reward(message.channel.id,args[0],args[1])
-            except:
-                await client.send_message(message.channel, "Sorry i'm a bit confused as to what you mean, the command is !ft reward <person> <amount>")
-                return
-            if res["err"] == 1:
-                await client.send_message(message.channel, "Sorry! I don't know who %s is, Perhaps try doing !ft register %s :)"%(args[0],args[0]))
-            elif res["err"] == 2:
-                await client.send_message(message.channel, "Sorry! Flirt points must be simple integers!")
-            else:
-                await client.send_message(message.channel, "%s is now at %d flirt points!"%(args[0],res["new"]))
-        elif c == "punish":
-            try:
-                res = punish(message.channel.id,args[0],args[1])
-            except:
-                await client.send_message(message.channel, "Sorry i'm a bit confused as to what you mean, the command is !ft punish <person> <amount>")
-                return
-            if res["err"] == 1:
-                await client.send_message(message.channel, "Sorry! I don't know who %s is, Perhaps try doing !ft register %s :)"%(args[0],args[0]))
-            elif res["err"] == 2:
-                await client.send_message(message.channel, "Sorry! Flirt points must be simple integers!")
-            else:
-                await client.send_message(message.channel, "%s is now at %d flirt points :("%(args[0],res["new"]))
-        elif c == "status":
-            try:
-                res = status(message.channel.id)
-            except:
-                await client.send_message(message.channel, "Sorry! Something went wrong :/")
-                return
-            if res["err"] == 1:
-                await client.send_message(message.channel, "Sorry i don't know anyone in this channel yet! Perhaps try doing !ft register :)")
-            else:
-                for r in res["data"]:
-                    print(r)
-                    await client.send_message(message.channel, r)
+    # ignore bots
+    if(message.author.bot):
+        return
+    m = message.content.lower().split(" ")
+    if len(m) > 1 and m[0] == "!hodge":
+        res = command(message.channel.id, m[1:])
+        if res["status"] == 1:
+            await client.send_message(message.channel, argError())
+        elif res["status"] == 2:
+            await client.send_message(message.channel, "I already have a phrase for that! You have to kill it first before replacing it.")
+        elif res["status"] == 3:
+            for line in res["data"]:
+                await client.send_message(message.channel, line)   
         else:
-            await client.send_message(message.channel, "Sorry! i don't know that command :(")
-    # a lil hint message
-    if message.content.lower().find("good flirt") != -1:
-        await client.send_message(message.channel, "Well hello, is sombody blushing? Maybe it's time to give someone some points ;)")
+            await client.send_message(message.channel, "Got it!")
+    elif len(m) == 1 and m[0] == "!hodge":
+        await client.send_message(message.channel, argError())
+    conn = sqlite3.connect('data.db')
+    c = conn.cursor()
+    c.execute("SELECT * FROM PHRASES WHERE CHANNEL_ID = ?",(message.channel.id,))
+    pairs = []
+    row = c.fetchone()
+    while row != None:
+        pairs.append((row[1],row[2]))
+        row = c.fetchone()
+    for pair in pairs:
+        if message.content.lower().find(str(pair[0])) != -1:
+           await client.send_message(message.channel, pair[1])
+           
 
-client.run("Mzk1MTU0ODc5NzAzNjc4OTc3.DSO0Fw.KVo8P42u9GeBB_RLBZ2dQGnEvKw")
+client.run("Mzk1MzgyNzA0OTYwNzAwNDE2.DSSITw.Te0v0ti0k_xkpxG-vxqm-tKQVZs")
 client.close()
