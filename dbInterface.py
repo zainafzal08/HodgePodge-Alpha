@@ -28,3 +28,24 @@ class Database():
     def newPhrase(self, channel, phrase, response):
         self.c.execute("INSERT INTO PHRASES VALUES (?,?,?)", (channel, phrase, response))
         self.conn.commit()
+
+    def searchSpell(self, search, field):
+        search = "%"+search+"%"
+        self.c.execute("SELECT * FROM SPELLS WHERE "+field+" LIKE ?", (search,))
+        row = self.c.fetchone()
+        res = []
+        while row != None:
+            rowDict = {}
+            rowDict["name"] = row[0]
+            rowDict["school"] = row[1]
+            rowDict["level"] = row[2]
+            rowDict["casting_time"] = row[3]
+            rowDict["components"] = row[4]
+            rowDict["duration"] = row[5]
+            rowDict["range"] = row[6]
+            rowDict["classes"] = row[7]
+            rowDict["description"] = row[8]
+            rowDict["at_higher_levels"] = row[9]
+            res.append(rowDict)
+            row = self.c.fetchone()
+        return res

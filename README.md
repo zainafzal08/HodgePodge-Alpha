@@ -9,4 +9,5 @@ Hosted with <3 on Heroku
 
 - [X] Make it so only admins can add
 - [X] Add ability to remove phrases
-- [ ] Add ability to ask Hodge about DnD spell info
+- [X] Add ability to ask Hodge about DnD spell info
+- [ ] Add ability for it to guess your spell better or search

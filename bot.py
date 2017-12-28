@@ -1,11 +1,14 @@
 import discord
 import asyncio
+import re
+import random
 from dbInterface import Database
 
 # Globals
 client = discord.Client()
 database = Database('data.db')
 commands = []
+questionTriggerPhrases = []
 # commands
 
 def newResultObject():
@@ -23,11 +26,11 @@ def listCommand(channel, arg):
     res["output"] = True
     raw = []
     raw.append("```")
-    raw.append("Trigger                    | Response                    ")
-    raw.append("=========================================================")
-    raw.append("```")
+    raw.append("Trigger                    | Response                   ")
+    raw.append("========================================================")
     for phrase in phrases:
-        raw.append(phrase[0].ljust(20)+"|"+phrase[1].ljust(10))
+        raw.append(phrase[0].ljust(27)+"| "+phrase[1].ljust(27))
+    raw.append("```")
     res["outputMsg"].append("\n".join(raw))
     return res
 
@@ -88,6 +91,13 @@ def regiserCommand(channel, arg):
 
 # Messagae Interperting Functions
 
+def extractQuestion(t):
+    m = t.lower()
+    m = re.sub(r'\s+',' ',m)
+    m = re.sub(r'[\,\.\?\;\:\%\#\@\!\^\&\*\+\-\+\_\~\']','',m)
+    m = m.strip()
+    return m
+
 async def isCommand(message):
     m = message.content.lower()
     args = m.split(" ")
@@ -116,12 +126,69 @@ async def runCommand(message):
         await client.send_message(message.channel, res["response"])
 
 async def isQuestion(message):
-    return False
-
-async def answerQuestion(message):
+    m = extractQuestion(message.content)
+    for trigger in list(map(lambda x: x[0], questionTriggerPhrases)):
+        try:
+            q = " ".join(m.split(" ")[0:len(trigger.split(" "))])
+        except:
+            continue
+        if q == trigger:
+            return trigger
     return None
 
-async  def triggerResponse(message):
+async def answerQuestion(question, message):
+    # grab relevant info
+    m = extractQuestion(message.content)
+    search = " ".join(m.split(" ")[len(question.split(" ")):])
+    questionObj = questionTriggerPhrases[list(map(lambda x: x[0], questionTriggerPhrases)).index(question)]
+    field = questionObj[1]
+    if field != None:
+        results = database.searchSpell(search, field)
+    else:
+        results = []
+    output = []
+    block = False
+
+    # check if this is a instant response
+    if questionObj[2] != None:
+        output.append(questionObj[2])
+    # form response
+    elif len(results) == 0:
+        output.append("*Flames shoot from the floor*\nMy database doesn't contain relevant information, thus the question must be incorrect\n Try asking me to look up just key words like `wall` or `fire` to see some options")
+    elif len(results) == 1:
+        block = True
+        results = results[0]
+        output.append(">> "+results["name"])
+        output.append("="*(len(results["name"])+5))
+        output.append("\nLevel      | "+str(results["level"]))
+        output.append("School     | "+results["school"])
+        output.append("Casting    | "+results["casting_time"])
+        output.append("Components | "+results["components"])
+        output.append("Duration   | "+results["duration"])
+        output.append("Range      | "+results["range"])
+        output.append("Classes    | "+results["classes"]+"\n")
+        output.append(results["description"])
+        output.append("\nAt a higher Level: "+results["at_higher_levels"])
+    else:
+        block = True
+        output.append("I have multiple entries for that!                              ")
+        output.append("===============================================================")
+        if len(results) > 10:
+            random.shuffle(results)
+            results = results[:10]
+        for row in results:
+            name = row["name"]
+            school = row["school"]
+            level = "Lv. "+str(row["level"])
+            output.append(name.ljust(33)+"| "+school.ljust(13)+"| "+level.ljust(13))
+
+    # respond
+    if block:
+        output = ["```"] + output + ["```"]
+    await client.send_message(message.channel, "\n".join(output))
+
+
+async def triggerResponse(message):
     phrases = database.allPhrases(message.channel.id)
     m = message.content.lower()
     output = []
@@ -139,6 +206,9 @@ async def on_ready():
     commands.append(("on", regiserCommand))
     commands.append(("kill", killCommand))
     commands.append(("help",helpCommand))
+    questionTriggerPhrases.append(("hey hodge podge whats","NAME",None))
+    questionTriggerPhrases.append(("hey hodge podge describe","NAME",None))
+    questionTriggerPhrases.append(("hey hodge podge",None,"Hello! I am here to help you learn!\nask me to *describe* a spell like `hey hodge podge describe passwall`"))
     print('Logged in as')
     print(client.user.name)
     print(client.user.id)
@@ -153,9 +223,11 @@ async def on_message(message):
     # attempt admin command parsing
     if await isCommand(message):
         await runCommand(message)
+        return
     # attempt question answering
-    elif await isQuestion(message):
-        await answerQuestion(message)
+    question = await isQuestion(message)
+    if question != None:
+        await answerQuestion(question, message)
     # attempt to respond to triggers
     await triggerResponse(message)
 
