@@ -171,7 +171,7 @@ async def answerQuestion(question, message):
         output.append("\nAt a higher Level: "+results["at_higher_levels"])
     else:
         block = True
-        output.append("I have multiple entries for that!                              ")
+        output.append("I have multiple entries for that! (showing max 10)             ")
         output.append("===============================================================")
         if len(results) > 10:
             random.shuffle(results)
