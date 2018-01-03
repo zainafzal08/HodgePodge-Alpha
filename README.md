@@ -16,3 +16,5 @@ Hosted with <3 on Heroku
 - [ ] add public and private commands
 - [ ] more robust trigger questions
 - [ ] ability to whisper to hodge podge
+- [ ] fix up list command output
+- [ ] more useful trigger options 
