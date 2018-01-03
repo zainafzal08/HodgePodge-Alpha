@@ -10,4 +10,6 @@ Hosted with <3 on Heroku
 - [X] Make it so only admins can add
 - [X] Add ability to remove phrases
 - [X] Add ability to ask Hodge about DnD spell info
-- [ ] Add ability for it to guess your spell better or search
+- [ ] Add ability for it to guess your spell better or search for spells for classes/@ levels
+- [ ] Update spell database to include elemental evil
+
