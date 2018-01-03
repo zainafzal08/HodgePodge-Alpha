@@ -18,3 +18,4 @@ Hosted with <3 on Heroku
 - [ ] ability to whisper to hodge podge
 - [ ] fix up list command output
 - [ ] more useful trigger options 
+- [ ] Have it respons with case's messages
