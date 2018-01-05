@@ -3,7 +3,7 @@ import re
 
 class Spells(Module):
     def __init__(self, db):
-        super().__init__()
+        super().__init__("Spells")
         self.db = db
 
     def clean(self, t):

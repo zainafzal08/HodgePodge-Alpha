@@ -3,7 +3,7 @@ import re
 
 class Memes(Module):
     def __init__(self, db):
-        super().__init__()
+        super().__init__("Memes")
         self.commands = [
             ("hodge podge list your memes", self.list),
             ("hodge podge on .+ say .+$",self.newMeme),
@@ -56,7 +56,7 @@ class Memes(Module):
         if level < 2:
             return
         channels = list(map(lambda x: x[0],self.db.getMemeChannels()))
-        s = re.search("hodge podge override on channel (\w+) on (.+) say (.+)$",self.shallowClean(message.content))
+        s = re.search("hodge podge override on channel (\w+) on (.+) say (.+)$",self.shallowClean(message.content),flags=re.IGNORECASE)
         channel = s.group(1).strip()
         on = self.clean(s.group(2))
         say = s.group(3).strip()
@@ -74,7 +74,7 @@ class Memes(Module):
     def overrideKillMeme(self, message, level):
         if level < 2:
             return
-        s = re.search("hodge podge override on channel (\w+) kill (.+)$",self.shallowClean(message.content))
+        s = re.search("hodge podge override on channel (\w+) kill (.+)$",self.shallowClean(message.content),flags=re.IGNORECASE)
         res = super().blankRes()
         channel = s.group(1).strip()
         on = self.clean(s.group(2))
@@ -92,7 +92,7 @@ class Memes(Module):
     def overrideListMeme(self, message, level):
         if level < 2:
             return
-        s = re.search("hodge podge override on channel (\w+) list memes",self.shallowClean(message.content))
+        s = re.search("hodge podge override on channel (\w+) list memes",self.shallowClean(message.content),flags=re.IGNORECASE)
         channel = s.group(1).strip()
         channels = list(map(lambda x: x[0],self.db.getMemeChannels()))
         res = super().blankRes()
@@ -118,7 +118,7 @@ class Memes(Module):
     def killMeme(self, message, level):
         if level < 1:
             return
-        s = re.search("hodge podge kill (.+)$",self.shallowClean(message.content))
+        s = re.search("hodge podge kill (.+)$",self.shallowClean(message.content),flags=re.IGNORECASE)
         res = super().blankRes()
         on = self.clean(s.group(1))
         err = self.db.deleteMeme(message.channel.id, on)
@@ -131,7 +131,7 @@ class Memes(Module):
     def newMeme(self, message, level):
         if level < 1:
             return
-        s = re.search("hodge podge on (.+) say (.+)$",self.shallowClean(message.content))
+        s = re.search("hodge podge on (.+) say (.+)$",self.shallowClean(message.content),flags=re.IGNORECASE)
         on = self.clean(s.group(1))
         say = s.group(2).strip()
         err = self.db.insertMeme(message.channel.id, on, say)

@@ -3,7 +3,7 @@ import re
 
 class Personality(Module):
     def __init__(self, db):
-        super().__init__()
+        super().__init__("Personality")
         self.triggers = {
             "i love you hodge podge": "I love you too friend :heart:",
             "hodge podge i love you": "I love you too friend :heart:",

@@ -14,4 +14,7 @@ Hosted with <3 on Heroku
 - [ ] Resource module for keeping track of gold and flirts
 - [ ] Update personality module to know peoples names and birthdays etc.
 - [ ] reminders
+- [ ] DICE ROLLING MODULE OBVIOUSLY
+- [ ] module to generate html character sheet?
+    - [ ] Let people take damage / roll dice!!!
 
