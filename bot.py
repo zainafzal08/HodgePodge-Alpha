@@ -36,6 +36,11 @@ async def respond(message, res):
         for line in res['output']:
             await client.send_message(message.channel, line)
 
+async def moduleErr(message, module, err):
+    msg = "_AwFuck_ ... My "+module+" Module has crashed\n"
+    msg += "Please let my dads zain and jack know that i had error: `"+err+"`"
+    await client.send_message(message.channel, msg)
+
 @client.event
 async def on_ready():
     print('Logged in as')
@@ -53,8 +58,11 @@ async def on_message(message):
     raw = message.content
     level = accessLevel(message.channel, message.author)
     for module in modules:
-        res = module.trigger(message, level)
-        await respond(message, res)
+        try:
+            res = module.trigger(message, level)
+            await respond(message, res)
+        except Exception as e:
+            await moduleErr(message,module.name,str(e))
 
 client.run(os.environ.get('BOT_TOKEN'))
 client.close()
