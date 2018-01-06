@@ -4,6 +4,7 @@ import re
 class Personality(Module):
     def __init__(self, db):
         super().__init__("Personality")
+        self.crashes = 0
         self.triggers = {
             "i love you hodge podge": "I love you too friend :heart:",
             "hodge podge i love you": "I love you too friend :heart:",
@@ -46,4 +47,7 @@ class Personality(Module):
             for key in self.superAdminTriggers:
                 if re.search("("+key+")",m) != None:
                     res["output"].append(self.superAdminTriggers[key])
+
+        if re.search("hodge podge status report",m)"
+            res["output"].append("Here you go dad!\n\n`[Crashes: %d]"%self.crashes)
         return res
