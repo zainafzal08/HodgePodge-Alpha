@@ -49,3 +49,47 @@ class Db():
         c = self.conn.cursor()
         c.execute("SELECT CHANNEL FROM MEMES")
         return self.fetchAll(c);
+
+    def scoreEdit(self, channel, scoreType, person, score):
+        c = self.conn.cursor()
+        c.execute("SELECT * FROM SCORES WHERE CHANNEL = %s AND TYPE = %s AND PERSON = %s",(channel,scoreType,person))
+        entry = c.fetchone()
+        if entry == None:
+            c.execute("INSERT INTO SCORES VALUES (%s,%s,%s,%s)",(channel,scoreType,person,score))
+            self.conn.commit()
+            return score
+        else:
+            score += entry[3]
+            c.execute("UPDATE SCORES SET POINTS = %s WHERE CHANNEL = %s AND PERSON = %s AND TYPE = %s",(score,channel,person,scoreType))
+            self.conn.commit()
+            return score
+
+    def scoreListTypes(self, channel):
+        c = self.conn.cursor()
+        c.execute("SELECT TYPE FROM SCORES WHERE CHANNEL = %s",(channel,))
+        return list(map(lambda x: str(x[0]),self.fetchAll(c)))
+
+    def getAllScores(self, channel, scoreType):
+        c = self.conn.cursor()
+        c.execute("SELECT PERSON, POINTS FROM SCORES WHERE CHANNEL = %s and TYPE = %s",(channel,scoreType))
+        return list(map(lambda x: (str(x[0]),str(x[1])),self.fetchAll(c)))
+
+    def spellGet(self, spell):
+        c = self.conn.cursor()
+        spell = "%"+spell+"%"
+        spell = spell.upper()
+        c.execute("SELECT * FROM SPELLS WHERE UPPER(NAME) LIKE %s",(spell,))
+        return self.fetchAll(c)
+
+    def spellSearch(self, search):
+        c = self.conn.cursor()
+        query = "SELECT * FROM SPELLS WHERE "
+        params = []
+        for i,k in enumerate(search.keys()):
+            if i == 0:
+                query+="UPPER("+k+") LIKE %s"
+            else:
+                query+=" AND UPPER("+k+") LIKE %s"
+            params.append("%"+search[k].upper()+"%")
+        c.execute(query,tuple(params))
+        return self.fetchAll(c)

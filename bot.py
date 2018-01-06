@@ -5,6 +5,7 @@ from modules.Module import Module
 from modules.Memes import Memes
 from modules.Personality import Personality
 from modules.Spells import Spells
+from modules.Game import Game
 from modules.Db import Db
 
 # Modules
@@ -13,11 +14,12 @@ modules = []
 modules.append(Memes(db))
 modules.append(Personality(db))
 modules.append(Spells(db))
+modules.append(Game(db))
 
 # Globals
 client = discord.Client()
 superAdmins = ["theGayAgenda","JDX3"]
-
+debug = True
 
 # Access Level
 
@@ -54,6 +56,7 @@ async def on_message(message):
     # ignore bots
     if(message.author.bot):
         return
+
     # trigger modules
     raw = message.content
     level = accessLevel(message.channel, message.author)
@@ -63,6 +66,8 @@ async def on_message(message):
             await respond(message, res)
         except Exception as e:
             await moduleErr(message,module.name,str(e))
+            if debug:
+                raise e
 
 client.run(os.environ.get('BOT_TOKEN'))
 client.close()
