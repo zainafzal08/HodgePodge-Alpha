@@ -48,6 +48,6 @@ class Personality(Module):
                 if re.search("("+key+")",m) != None:
                     res["output"].append(self.superAdminTriggers[key])
 
-        if re.search("hodge podge status report",m)"
+        if re.search("hodge podge status report",m):
             res["output"].append("Here you go dad!\n\n`[Crashes: %d]"%self.crashes)
         return res
