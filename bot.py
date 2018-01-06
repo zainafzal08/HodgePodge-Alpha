@@ -19,7 +19,7 @@ modules.append(Game(db))
 # Globals
 client = discord.Client()
 superAdmins = ["theGayAgenda","JDX3"]
-debug = True
+debug = False
 
 # Access Level
 
@@ -65,6 +65,7 @@ async def on_message(message):
             res = module.trigger(message, level)
             await respond(message, res)
         except Exception as e:
+            modules[1].crashes+=1
             await moduleErr(message,module.name,str(e))
             if debug:
                 raise e
