@@ -16,7 +16,7 @@ class Game(Module):
         self.scoreEditLevel = 0
 
     def roll(self, message, level):
-        s = re.search(r"hodge podge roll a d(\d+)\s*$",message.content)
+        s = re.search(r"hodge podge roll a d(\d+)\s*$",self.clean(message.content))
         d = int(s.group(1))
         res = super().blankRes()
         if d > 1000:
@@ -30,8 +30,8 @@ class Game(Module):
         if level < self.scoreEditLevel:
             return
 
-        s1 = re.search(r"hodge podge give (.*) (\d+) (.*) points?\s*$",message.content)
-        s2 = re.search(r"hodge podge take (\d+) (.*) points? from (.*)\s*$",message.content)
+        s1 = re.search(r"hodge podge give (.*) (\d+) (.*) points?\s*$",self.clean(message.content))
+        s2 = re.search(r"hodge podge take (\d+) (.*) points? from (.*)\s*$",self.clean(message.content))
 
         if s1:
             s = s1
@@ -73,7 +73,7 @@ class Game(Module):
         if level < self.scoreEditLevel:
             return
 
-        s = re.search("hodge podge summerise (.*) points\s*$",message.content)
+        s = re.search("hodge podge summerise (.*) points\s*$",self.clean(message.content))
         scoreType = self.shallowClean(s.group(1))
         l = self.db.getAllScores(message.channel.id, scoreType)
         res = super().blankRes()
