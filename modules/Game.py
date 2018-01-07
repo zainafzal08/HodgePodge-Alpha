@@ -100,7 +100,7 @@ class Game(Module):
         if len(l) == 0:
             result.append("Nobody has any points yet!")
         else:
-            result.append("Here's all the "+scoreType+"scores!")
+            result.append("Here's all the "+scoreType+" scores!")
             for line in l:
                 result.append(":::> **"+line[0]+"** : "+line[1])
         res["output"].append("\n".join(result))
