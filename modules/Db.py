@@ -72,7 +72,7 @@ class Db():
     def getAllScores(self, channel, scoreType):
         c = self.conn.cursor()
         c.execute("SELECT PERSON, POINTS FROM SCORES WHERE CHANNEL = %s and TYPE = %s",(channel,scoreType))
-        return list(map(lambda x: (str(x[0]),str(x[1])),self.fetchAll(c)))
+        return list(set(list(map(lambda x: (str(x[0]),str(x[1])),self.fetchAll(c)))))
 
     def spellGet(self, spell):
         c = self.conn.cursor()
