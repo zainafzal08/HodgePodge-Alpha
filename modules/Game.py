@@ -7,6 +7,7 @@ class Game(Module):
         super().__init__("Game")
         self.commands = [
             ("hodge podge roll a d\d+\s*$", self.roll),
+            ("hodge podge roll \d+ d\d+s?\s*$", self.multiRoll),
             ("hodge podge give .* \d+ .* points?\s*$", self.editPoints),
             ("hodge podge take \d+ .* points? from .*\s*$", self.editPoints),
             ("hodge podge list all score types\s*$", self.listPoints),
@@ -14,6 +15,24 @@ class Game(Module):
         ]
         self.db = db
         self.scoreEditLevel = 0
+
+    def multiRoll(self, message, level):
+        s = re.search(r"hodge podge roll (\d+) d(\d+)s?\s*$",self.clean(message.content))
+        count = int(s.group(1))
+        d = int(s.group(2))
+        res = super().blankRes()
+        if d > 1000 or count > 100:
+            res["output"].append("Sorry friend! That number is too big")
+        else:
+            roll = 0
+            components = []
+            for i in range(count):
+                r = random.randint(1,d)
+                roll += r
+                components.append(str(r))
+            roll = str(roll)
+            res["output"].append("It landed on "+roll+" ("+"+".join(components)+")")
+        return res
 
     def roll(self, message, level):
         s = re.search(r"hodge podge roll a d(\d+)\s*$",self.clean(message.content))
