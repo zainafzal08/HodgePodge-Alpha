@@ -17,3 +17,6 @@ Hosted with <3 on Heroku
 - [X] DICE ROLLING MODULE OBVIOUSLY
 - [ ] module to generate html character sheet?
     - [ ] Let people take damage / roll dice!!!
+- [ ] Let hodge podge google shit
+- [ ] Let hodge podge respond to "who do you work for"
+- [ ] Let hodge podge respond to "what is love"

@@ -2,8 +2,9 @@ from modules.Module import Module
 import re
 
 class Memes(Module):
-    def __init__(self, db):
+    def __init__(self, db, client):
         super().__init__("Memes")
+        self.client = client
         self.commands = [
             ("hodge podge list your memes", self.list),
             ("hodge podge on .+ say .+$",self.newMeme),
@@ -11,7 +12,8 @@ class Memes(Module):
             ("hodge podge override list channels$",self.listChannels),
             ("hodge podge override on channel \w+ on .+ say .+$",self.overrideNewMeme),
             ("hodge podge override on channel \w+ list memes",self.overrideListMeme),
-            ("hodge podge override on channel \w+ kill .+$",self.overrideKillMeme)
+            ("hodge podge override on channel \w+ kill .+$",self.overrideKillMeme),
+            ("hodge podge cycle image", self.cycleImage)
         ]
         self.db = db
 
@@ -27,17 +29,19 @@ class Memes(Module):
         m = m.strip()
         return m
 
-    def channelIdToName(self,server, search):
-        for channel in server.channels:
-            if channel.id == search:
-                return channel.name
-        return "Unknown"
+    def channelIdToName(self, search):
+        channel = self.client.get_channel(search)
+        server = channel.server
+        return "%s (%s)"%(server.name, channel.name)
+
+    def cycleImage(self, message, level):
+        if level < 1:
+            return
 
     def listChannels(self, message, level):
         if level < 2:
             return
         channels = list(map(lambda x: x[0],self.db.getMemeChannels()))
-        server = message.server
 
         response = []
         if len(channels) == 0:
@@ -46,7 +50,7 @@ class Memes(Module):
             response.append("Here are all the channels i know!")
             response.append("\n")
             for channel in channels:
-                response.append("**"+channel+"**:\t"+self.channelIdToName(server,channel))
+                response.append("**"+channel+"**:\t"+self.channelIdToName(channel))
             response.append("\n")
         res = super().blankRes()
         res["output"].append("\n".join(response))
