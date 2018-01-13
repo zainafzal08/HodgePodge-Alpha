@@ -8,18 +8,19 @@ from modules.Spells import Spells
 from modules.Game import Game
 from modules.Db import Db
 
-# Modules
-db = Db()
-modules = []
-modules.append(Memes(db))
-modules.append(Personality(db))
-modules.append(Spells(db))
-modules.append(Game(db))
-
 # Globals
 client = discord.Client()
 superAdmins = ["theGayAgenda","JDX3"]
 debug = False
+
+# Modules
+db = Db()
+modules = []
+modules.append(Memes(db, client))
+modules.append(Personality(db))
+modules.append(Spells(db))
+modules.append(Game(db))
+
 
 # Access Level
 

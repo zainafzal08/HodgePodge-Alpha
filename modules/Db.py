@@ -19,7 +19,16 @@ class Db():
             result.append(curr)
             curr = c.fetchone()
         return result
-
+    def removeDuplicates(self, l, i):
+        seen = []
+        s = []
+        for e in l:
+            if e[i] in seen:
+                continue
+            else:
+                seen.append(e[i])
+                s.append(e)
+        return s
     def getAllMemes(self, channel):
         c = self.conn.cursor()
         c.execute("SELECT * FROM MEMES WHERE CHANNEL = %s",(channel,))
@@ -48,7 +57,7 @@ class Db():
     def getMemeChannels(self):
         c = self.conn.cursor()
         c.execute("SELECT CHANNEL FROM MEMES")
-        return self.fetchAll(c);
+        return self.removeDuplicates(self.fetchAll(c),0);
 
     def scoreEdit(self, channel, scoreType, person, score):
         c = self.conn.cursor()
@@ -67,7 +76,7 @@ class Db():
     def scoreListTypes(self, channel):
         c = self.conn.cursor()
         c.execute("SELECT TYPE FROM SCORES WHERE CHANNEL = %s",(channel,))
-        return list(map(lambda x: str(x[0]),self.fetchAll(c)))
+        return self.removeDuplicates(self.fetchAll(c),0)
 
     def getAllScores(self, channel, scoreType):
         c = self.conn.cursor()
