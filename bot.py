@@ -10,7 +10,7 @@ from modules.Db import Db
 
 # Globals
 client = discord.Client()
-superAdmins = ["theGayAgenda","JDX3"]
+superAdmins = ["330337388196790284","182968035819126784"]
 debug = False
 
 # Modules
@@ -26,7 +26,7 @@ modules.append(Game(db))
 
 def accessLevel(channel, person):
     roles = list(map(lambda x: x.name, person.roles))
-    if person.name in superAdmins:
+    if person.id in superAdmins:
         return 2
     elif "Hodge Podge Wrangler" in roles:
         return 1
