@@ -1,6 +1,7 @@
 from modules.Module import Module
 import re
 import random
+from discord.utils import find
 
 class Game(Module):
     def __init__(self, db):
@@ -63,14 +64,14 @@ class Game(Module):
 
         person = None
         if len(message.mentions) != None:
-            person = message.mentions[0].name
+            person = message.mentions[0]
         res = super().blankRes()
 
         if not person:
             res["output"].append("Sorry! I don't know who to target! Did you make sure to use a valid `@` mention?")
         else:
-            new = self.db.scoreEdit(message.channel.id, scoreType, person, score)
-            res["output"].append(person + " now has "+str(new)+" points!")
+            new = self.db.scoreEdit(message.channel.id, scoreType, person.id, score)
+            res["output"].append(person.name + " now has "+str(new)+" points!")
         return res
 
     def listPoints(self, message, level):
@@ -97,12 +98,14 @@ class Game(Module):
         l = self.db.getAllScores(message.channel.id, scoreType)
         res = super().blankRes()
         result = []
+        server = message.channel.server
         if len(l) == 0:
             result.append("Nobody has any points yet!")
         else:
             result.append("Here's all the "+scoreType+" scores!")
             for line in l:
-                result.append(":::> **"+line[0]+"** : "+line[1])
+                p = find(lambda m: m.id == line[0], server.members)
+                result.append(":::> **"+p.name+"** : "+line[1])
         res["output"].append("\n".join(result))
         return res
 
