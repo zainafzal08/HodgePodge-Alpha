@@ -2,7 +2,7 @@ from modules.Module import Module
 import re
 
 class Memes(Module):
-    def __init__(self, db, client):
+    def __init__(self, db, client, parser):
         super().__init__("Memes")
         self.client = client
         self.commands = [

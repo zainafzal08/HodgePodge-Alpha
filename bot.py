@@ -7,6 +7,7 @@ from modules.Personality import Personality
 from modules.Spells import Spells
 from modules.Game import Game
 from modules.Db import Db
+from mofules.CommandParser import CommandParser
 
 # Globals
 client = discord.Client()
@@ -15,11 +16,12 @@ debug = False
 
 # Modules
 db = Db()
+parser = CommandParser()
 modules = []
-modules.append(Memes(db, client))
-modules.append(Personality(db))
-modules.append(Spells(db))
-modules.append(Game(db))
+modules.append(Memes(db,client,parser))
+modules.append(Personality(db,client,parser))
+modules.append(Spells(db,client,parser))
+modules.append(Game(db,client,parser))
 
 
 # Access Level

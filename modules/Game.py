@@ -4,26 +4,52 @@ import random
 from discord.utils import find
 
 class Game(Module):
-    def __init__(self, db):
+    def __init__(self, db, client, parser, formatter):
         super().__init__("Game")
-        self.commands = [
-            ("hodge podge roll a d\d+\s*$", self.roll),
-            ("hodge podge roll \d+ d\d+s?\s*$", self.multiRoll),
-            ("hodge podge give .* \d+ .* points?\s*$", self.editPoints),
-            ("hodge podge take \d+ .* points? from .*\s*$", self.editPoints),
-            ("hodge podge list all score types\s*$", self.listPoints),
-            ("hodge podge summerise .* points?\s*$", self.getPoints)
-        ]
+        self.parser = parser
+        self.formatter = formatter
         self.db = db
         self.scoreEditLevel = 0
+        self.registerCommands()
 
-    def multiRoll(self, message, level):
-        s = re.search(r"hodge podge roll (\d+) d(\d+)s?\s*$",self.clean(message.content))
-        count = int(s.group(1))
-        d = int(s.group(2))
-        res = super().blankRes()
+    def registerCommands(self):
+        self.parser.register({
+            "trigger":"hodge podge roll a d\d+\s*$",
+            "function":self.roll,
+            "accessLevel": 0
+            })
+        self.parser.register({
+            "trigger": "hodge podge roll \d+ d\d+s?\ss*$",
+            "function": self.multiRoll,
+            "accessLevel": 0
+            })
+        self.parser.register({
+            "trigger": "hodge podge give .* \d+ .* points?\s*$",
+            "function": self.editPoints,
+            "accessLevel": self.scoreEditLevel
+            })
+        self.parser.register({
+            "trigger": "hodge podge take \d+ .* points? from .*\s*$",
+            "function": self.editPoints,
+            "accessLevel": self.scoreEditLevel
+            })
+        self.parser.register({
+            "trigger": "hodge podge list all score types\s*$",
+            "function": self.listPoints,
+            "accessLevel": self.scoreEditLevel
+            })
+        self.parser.register({
+            "trigger": "hodge podge summerise .* points?\s*$",
+            "function": self.getPoints,
+            "accessLevel": self.scoreEditLevel
+            })
+
+    def multiRoll(self, trigger):
+        args = trigger["args"]
+        count = int(args[0])
+        d = int(args[1])
         if d > 1000 or count > 100:
-            res["output"].append("Sorry friend! That number is too big")
+            self.formatter.error("Sorry friend! That number is too big")
         else:
             roll = 0
             components = []
@@ -32,98 +58,56 @@ class Game(Module):
                 roll += r
                 components.append(str(r))
             roll = str(roll)
-            res["output"].append("I got "+roll+"! ("+"+".join(components)+")")
-        return res
+            self.formatter.output("I got %s! (%s)"%(roll,"+".join(components)))
 
-    def roll(self, message, level):
-        s = re.search(r"hodge podge roll a d(\d+)\s*$",self.clean(message.content))
-        d = int(s.group(1))
-        res = super().blankRes()
+    def roll(self, trigger):
+        args = trigger["args"]
+        d = int(args[0])
         if d > 1000:
-            res["output"].append("Sorry friend! That number is too big")
+            self.formatter.output("Sorry friend! That number is too big")
         else:
             roll = str(random.randint(1,d))
-            res["output"].append("It landed on "+roll+"!")
-        return res
+            self.formatter.output("It landed on %s!"%roll)
 
-    def editPoints(self, message, level):
-        if level < self.scoreEditLevel:
-            return
+    def editPoints(self, trigger):
+        args = trigger["args"]
+        match = trigger["match"]
 
-        s1 = re.search(r"hodge podge give (.*) (\d+) (.*) points?\s*$",self.clean(message.content))
-        s2 = re.search(r"hodge podge take (\d+) (.*) points? from (.*)\s*$",self.clean(message.content))
-
-        if s1:
+        if match == 0:
             s = s1
-            score = int(s.group(2))
-            scoreType = self.shallowClean(s.group(3))
-        elif s2:
+            score = int(args[1])
+            scoreType = args[2].lower()
+        else:
             s = s2
-            score = int(s.group(1))*-1
-            scoreType = self.shallowClean(s.group(2))
+            score = int(args[0])*-1
+            scoreType = args[1].lower()
 
         person = None
-        if len(message.mentions) != None:
+        if len(message.mentions) > 0:
             person = message.mentions[0]
-        res = super().blankRes()
-
         if not person:
-            res["output"].append("Sorry! I don't know who to target! Did you make sure to use a valid `@` mention?")
+            self.formatter.error("Sorry! I don't know who to target! Did you make sure to use a valid `@` mention?")
         else:
             new = self.db.scoreEdit(message.channel.id, scoreType, person.id, score)
-            res["output"].append(person.name + " now has "+str(new)+" points!")
-        return res
+            self.formatter.output("%s now has %d points!"%(person.name,new))
 
-    def listPoints(self, message, level):
-        if level < self.scoreEditLevel:
-            return
+    def listPoints(self, trigger):
+        args = trigger["args"]
         l = self.db.scoreListTypes(message.channel.id)
-        res = super().blankRes()
-        result = []
         if len(l) == 0:
-            result.append("I'm not keeping track of any points yet!")
+            self.formatter.error("I'm not keeping track of any points yet!")
         else:
-            result.append("Here's all the score types i'm keeping track off!")
-            for line in l:
-                result.append(":::> **"+line+"**")
-        res["output"].append("\n".join(result))
-        return res
+            self.formatter.output("Here's all the score types i'm keeping track off!")
+            self.formatter.list(l)
 
-    def getPoints(self, message, level):
-        if level < self.scoreEditLevel:
-            return
-
-        s = re.search("hodge podge summerise (.*) points\s*$",self.clean(message.content))
-        scoreType = self.shallowClean(s.group(1))
+    def getPoints(self, trigger):
+        args = trigger["args"]
+        scoreType = args[0].lower() #TODO: Make sure we don't need a shallow clean here
         l = self.db.getAllScores(message.channel.id, scoreType)
-        res = super().blankRes()
-        result = []
         server = message.channel.server
         if len(l) == 0:
-            result.append("Nobody has any points yet!")
+            self.formatter.error("Nobody has any points yet!")
         else:
-            result.append("Here's all the "+scoreType+" scores!")
-            for line in l:
-                p = find(lambda m: m.id == line[0], server.members)
-                result.append(":::> **"+p.name+"** : "+line[1])
-        res["output"].append("\n".join(result))
-        return res
-
-    def shallowClean(self, t):
-        return t.strip().lower()
-
-    def clean(self, t):
-        m = t.lower()
-        m = re.sub(r'\s+',' ',m)
-        m = re.sub(r'[\,\.\?\;\:\%\#\@\!\^\&\*\+\-\+\_\~\']','',m)
-        m = m.strip()
-        return m
-
-    def trigger(self, message, requestLevel):
-        res = super().blankRes()
-        original = message.content;
-        m = self.clean(message.content)
-        for command in self.commands:
-            if re.search(command[0],m):
-                res = command[1](message,requestLevel)
-        return res
+            self.formatter.output("Here's all the %s scores!"%scoreType)
+            l = list(map(lambda x: x[0] = find(lambda m: m.id == x[0], server.members).name))
+            self.formatter.list(l)

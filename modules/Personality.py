@@ -2,7 +2,7 @@ from modules.Module import Module
 import re
 
 class Personality(Module):
-    def __init__(self, db):
+    def __init__(self, db, client, parser):
         super().__init__("Personality")
         self.crashes = 0
         self.triggers = {

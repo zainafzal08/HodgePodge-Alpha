@@ -3,7 +3,7 @@ import re
 import random
 
 class Spells(Module):
-    def __init__(self, db):
+    def __init__(self, db, client, parser):
         super().__init__("Spells")
         self.db = db
         self.spellSearchLevel = 0
