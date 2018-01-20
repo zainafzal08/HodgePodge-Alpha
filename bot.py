@@ -1,28 +1,19 @@
 import discord
 import asyncio
 import os
-from modules.Module import Module
-from modules.Memes import Memes
-from modules.Personality import Personality
-from modules.Spells import Spells
-from modules.Game import Game
-from modules.Db import Db
-from mofules.CommandParser import CommandParser
 
 # Globals
 client = discord.Client()
 superAdmins = ["330337388196790284","182968035819126784"]
 debug = False
+modules = []
 
 # Modules
-db = Db()
-parser = CommandParser()
-modules = []
-modules.append(Memes(db,client,parser))
-modules.append(Personality(db,client,parser))
-modules.append(Spells(db,client,parser))
-modules.append(Game(db,client,parser))
+modules.append(Game())
 
+# hacky way to get class global varaible
+parser = modules[0].parser
+formatter = modules[0].formatter
 
 # Access Level
 
@@ -34,17 +25,6 @@ def accessLevel(channel, person):
         return 1
     else:
         return 0
-
-# Discord event handlers
-async def respond(message, res):
-    if res['output'] != None:
-        for line in res['output']:
-            await client.send_message(message.channel, line)
-
-async def moduleErr(message, module, err):
-    msg = "_AwFuck_ ... My "+module+" Module has crashed\n"
-    msg += "Please let my dads zain and jack know that i had error: `"+err+"`"
-    await client.send_message(message.channel, msg)
 
 @client.event
 async def on_ready():
@@ -60,18 +40,11 @@ async def on_message(message):
     if(message.author.bot):
         return
 
-    # trigger modules
+    # attempt to parse
     raw = message.content
     level = accessLevel(message.channel, message.author)
-    for module in modules:
-        try:
-            res = module.trigger(message, level)
-            await respond(message, res)
-        except Exception as e:
-            modules[1].crashes+=1
-            await moduleErr(message,module.name,str(e))
-            if debug:
-                raise e
+    parser.parse(raw,level)
+
 
 client.run(os.environ.get('BOT_TOKEN'))
 client.close()

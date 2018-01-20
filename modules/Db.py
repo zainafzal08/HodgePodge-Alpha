@@ -12,93 +12,131 @@ class Db():
         port = url.port
         self.conn = psycopg2.connect(dbname=dbname,user=user,password=password,host=host,port=port)
 
-    def fetchAll(self, c):
-        curr = c.fetchone()
+    def removeDuplicates(self, l):
         result = []
-        while curr != None:
-            result.append(curr)
-            curr = c.fetchone()
-        return result
-    def removeDuplicates(self, l, i):
-        seen = []
-        s = []
         for e in l:
-            if e[i] in seen:
-                continue
-            else:
-                seen.append(e[i])
-                s.append(e)
-        return s
-    def getAllMemes(self, channel):
-        c = self.conn.cursor()
-        c.execute("SELECT * FROM MEMES WHERE CHANNEL = %s",(channel,))
-        result = self.fetchAll(c)
-        result = list(map(lambda x: x[1:],result))
+            if e not in result:
+                result.append(e)
         return result
 
-    def insertMeme(self, channel, on, say):
-        c = self.conn.cursor()
-        c.execute("SELECT * FROM MEMES WHERE CHANNEL = %s AND TRIGGER = %s",(channel,on))
-        if c.fetchone() != None:
-            return True
-        c.execute("INSERT INTO MEMES VALUES (%s,%s,%s)",(channel,on,say))
-        self.conn.commit()
-        return False
-
-    def deleteMeme(self, channel, on):
-        c = self.conn.cursor()
-        c.execute("SELECT * FROM MEMES WHERE CHANNEL = %s AND TRIGGER = %s",(channel,on))
-        if c.fetchone() == None:
-            return True
-        c.execute("DELETE FROM MEMES WHERE CHANNEL = %s AND TRIGGER = %s",(channel,on))
-        self.conn.commit()
-        return False
-
-    def getMemeChannels(self):
-        c = self.conn.cursor()
-        c.execute("SELECT CHANNEL FROM MEMES")
-        return self.removeDuplicates(self.fetchAll(c),0);
-
-    def scoreEdit(self, channel, scoreType, person, score):
-        c = self.conn.cursor()
-        c.execute("SELECT * FROM SCORES WHERE CHANNEL = %s AND TYPE = %s AND PERSON = %s",(channel,scoreType,person))
-        entry = c.fetchone()
-        if entry == None:
-            c.execute("INSERT INTO SCORES VALUES (%s,%s,%s,%s)",(channel,scoreType,person,score))
-            self.conn.commit()
-            return score
-        else:
-            score += entry[3]
-            c.execute("UPDATE SCORES SET POINTS = %s WHERE CHANNEL = %s AND PERSON = %s AND TYPE = %s",(score,channel,person,scoreType))
-            self.conn.commit()
-            return score
-
-    def scoreListTypes(self, channel):
-        c = self.conn.cursor()
-        c.execute("SELECT TYPE FROM SCORES WHERE CHANNEL = %s",(channel,))
-        return self.removeDuplicates(self.fetchAll(c),0)
-
-    def getAllScores(self, channel, scoreType):
-        c = self.conn.cursor()
-        c.execute("SELECT PERSON, POINTS FROM SCORES WHERE CHANNEL = %s and TYPE = %s",(channel,scoreType))
-        return list(set(list(map(lambda x: (str(x[0]),str(x[1])),self.fetchAll(c)))))
-
-    def spellGet(self, spell):
-        c = self.conn.cursor()
-        spell = "%"+spell+"%"
-        spell = spell.upper()
-        c.execute("SELECT * FROM SPELLS WHERE UPPER(NAME) LIKE %s",(spell,))
-        return self.fetchAll(c)
-
-    def spellSearch(self, search):
-        c = self.conn.cursor()
-        query = "SELECT * FROM SPELLS WHERE "
-        params = []
-        for i,k in enumerate(search.keys()):
-            if i == 0:
-                query+="UPPER("+k+") LIKE %s"
+    def formStrictFilters(self, r, query, caseIns):
+        query += " WHERE "
+        for i,fil in enumerate(r["WHERE"].keys()):
+            if i == 0 and caseIns:
+                query += (" UPPER(%s) = %s"%(fil,r["WHERE"][fil].upper())
+            elif caseIns:
+                query += (" AND UPPER(%s) = %s"%(fil,r["WHERE"][fil].upper())
+            elif i == 0:
+                query += (" %s = %s"%(fil,r["WHERE"][fil]))
             else:
-                query+=" AND UPPER("+k+") LIKE %s"
-            params.append("%"+search[k].upper()+"%")
-        c.execute(query,tuple(params))
-        return self.fetchAll(c)
+                query += (" AND %s = %s"%(fil,r["WHERE"][fil]))
+        return query
+
+    def formSearchFilters(self, r, query, caseIns):
+        query += " WHERE "
+        for i,fil in enumerate(r["WHERE"].keys()):
+            if i == 0 and caseIns:
+                query += (" UPPER(%s) LIKE %%s"%fil)
+                params.append(r["WHERE"][fil].upper())
+            elif caseIns:
+                query += (" AND UPPER(%s) LIKE %%s"%fil)
+                params.append(r["WHERE"][fil].upper())
+            elif i == 0:
+                query += (" %s LIKE %%s"%fil)
+                params.append(r["WHERE"][fil])
+            else:
+                query += (" AND %s LIKE %%s"%fil)
+                params.append(r["WHERE"][fil])
+        return (query,params)
+
+    def exists(self, table, fields, r):
+        query = "SELECT %s FROM %s"%(fields, table)
+        query = formStrictFilters(r,query,True)
+        c = self.conn.cursor()
+        c.execute(query)
+        if c.fetchone() != None:
+            return False
+        else:
+            return True
+
+    def edit(self, r):
+
+        # basic params
+        c = self.conn.cursor()
+        force = r.get("FORCE",False)
+        ret = r.get("RETURN","NEW")
+        # get query Basics
+        if "TABLE" not in r or "SET" not in r:
+            raise Exception("No Table or Field Specified")
+        fields = map(lambda x: x.upper(), r["SET"])
+        fields = ", ".join(fields)
+        table = r["TABLE"]
+        exists = self.exists(table,fields,r)
+
+        if exists:
+
+        elif not exists and force:
+
+        else:
+            raise Exception("No Matching Entry To Update, Use force=true To Create Entry")
+
+        if ret == "OLD":
+            return old
+        else:
+            return new
+
+    def search(self, r):
+        # basic params
+        c = self.conn.cursor()
+        caseIns = r.get("CASE_INS",True)
+        dups = r.get("DUPS",False)
+
+        # form base query
+        if "TABLE" not in r or "GET" not in r:
+            raise Exception("No Table or Field Specified")
+        fields = map(lambda x: x.upper(), r["GET"])
+        fields = ", ".join(fields)
+        table = r["TABLE"]
+        query = "SELECT %s FROM %s"%(fields, table)
+        params = None
+
+        # form filters
+        if "WHERE" in r and len(r["WHERE"].keys()) > 0:
+            filters = self.formSearchFilters(r,query, caseIns)
+            query = filters[0]
+            params = filters[1]
+        # Execute
+        if params != None
+            c.execute(query,tuple(params))
+        else:
+            c.execute(query)
+        results = c.fetchAll()
+        if not dups:
+            results = removeDuplicates(results)
+        return results
+
+    # NOT TO BE USED FOR USER INPUT
+    # USE SEARCH BECAUSE IT SANTISES INPUT
+    def get(self, r):
+        # basic params
+        c = self.conn.cursor()
+        caseIns = r.get("CASE_INS",True)
+        dups = r.get("DUPS",False)
+
+        # form base query
+        if "TABLE" not in r or "GET" not in r:
+            raise Exception("No Table or Field Specified")
+        fields = map(lambda x: x.upper(), r["GET"])
+        fields = ", ".join(fields)
+        table = r["TABLE"]
+        query = "SELECT %s FROM %s"%(fields, table)
+
+        # form filters
+        if "WHERE" in r and len(r["WHERE"].keys()) > 0:
+            query = self.formStrictFilters(query, caseIns)
+        # Execute
+        c.execute(query)
+        results = c.fetchAll()
+        if not dups:
+            results = removeDuplicates(results)
+        return results
