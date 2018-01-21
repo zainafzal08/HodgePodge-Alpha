@@ -7,48 +7,55 @@ class Game(Module):
     def __init__(self):
         super().__init__("Game")
         self.scoreEditLevel = 0
-        self.registerCommands()
-
-    def registerCommands(self):
-        parser.register({
+        self.triggerList = []
+        self.db = None
+        self.formatter = Formatter()
+        self.triggerList.append({
             "trigger":"hodge podge roll a d\d+\s*$",
             "function":self.roll,
             "accessLevel": 0
             })
-        parser.register({
+        self.triggerList.append({
             "trigger": "hodge podge roll \d+ d\d+s?\ss*$",
             "function": self.multiRoll,
             "accessLevel": 0
             })
-        parser.register({
+        self.triggerList.append({
             "trigger": "hodge podge give .* \d+ .* points?\s*$",
             "function": self.editPoints,
             "accessLevel": self.scoreEditLevel
             })
-        parser.register({
+        self.triggerList.append({
             "trigger": "hodge podge take \d+ .* points? from .*\s*$",
             "function": self.editPoints,
             "accessLevel": self.scoreEditLevel
             })
-        parser.register({
+        self.triggerList.append({
             "trigger": "hodge podge list all score types\s*$",
             "function": self.listPoints,
             "accessLevel": self.scoreEditLevel
             })
-        parser.register({
+        self.triggerList.append({
             "trigger": "hodge podge summerise .* points?\s*$",
             "function": self.getPoints,
             "accessLevel": self.scoreEditLevel
             })
 
-    def generateDbRequest():
+    def connectDb(self, db):
+        self.db = db
+
+    def getTriggerList(self):
+        return triggerList;
+
+    def respond(self, client):
+        self.formatter.flush(client)
 
     def multiRoll(self, trigger):
         args = trigger["args"]
         count = int(args[0])
         d = int(args[1])
         if d > 1000 or count > 100:
-            formatter.error("Sorry friend! That number is too big")
+            self.formatter.error("Sorry friend! That number is too big")
             return
         roll = 0
         components = []
@@ -56,16 +63,16 @@ class Game(Module):
             r = random.randint(1,d)
             roll += r
             components.append(str(r))
-        formatter.output("I got %d! (%s)"%(roll,"+".join(components)))
+        self.formatter.output("I got %d! (%s)"%(roll,"+".join(components)))
 
     def roll(self, trigger):
         args = trigger["args"]
         d = int(args[0])
         if d > 1000:
-            formatter.output("Sorry friend! That number is too big")
+            self.formatter.output("Sorry friend! That number is too big")
         else:
             roll = str(random.randint(1,d))
-            formatter.output("It landed on %s!"%roll)
+            self.formatter.output("It landed on %s!"%roll)
 
     def editPoints(self, trigger):
         args = trigger["args"]
@@ -84,7 +91,7 @@ class Game(Module):
         if len(message.mentions) > 0:
             person = message.mentions[0]
         if not person:
-            formatter.error("Sorry! I don't know who to target! Did you make sure to use a valid `@` mention?")
+            self.formatter.error("Sorry! I don't know who to target! Did you make sure to use a valid `@` mention?")
         else:
             request = {
                 "TABLE": "SCORES"
@@ -98,8 +105,8 @@ class Game(Module):
                 "RETURN": "NEW",
                 "FORCE": True
             }
-            new = db.edit(request)
-            formatter.output("%s now has %d points!"%(person.name,new))
+            new = self.db.edit(request)
+            self.formatter.output("%s now has %d points!"%(person.name,new))
 
     def listPoints(self, trigger):
         request = {
@@ -110,12 +117,12 @@ class Game(Module):
             },
             "DUP": False
         }
-        l = db.get(request)
+        l = self.db.get(request)
         if len(l) == 0:
-            formatter.error("I'm not keeping track of any points yet!")
+            self.formatter.error("I'm not keeping track of any points yet!")
         else:
-            formatter.output("Here's all the score types i'm keeping track off!")
-            formatter.list(l)
+            self.formatter.output("Here's all the score types i'm keeping track off!")
+            self.formatter.list(l)
 
     def getPoints(self, trigger):
         args = trigger["args"]
@@ -132,8 +139,8 @@ class Game(Module):
         l = self.db.get(request)
         server = message.channel.server
         if len(l) == 0:
-            formatter.error("Nobody has any points yet!")
+            self.formatter.error("Nobody has any points yet!")
         else:
-            formatter.output("Here's all the %s scores!"%scoreType)
+            self.formatter.output("Here's all the %s scores!"%scoreType)
             l = list(map(lambda x: x[0] = find(lambda m: m.id == x[0], server.members).name))
-            formatter.list(l)
+            self.formatter.list(l)

@@ -5,18 +5,12 @@ Inspired by TAZ!
 
 Hosted with <3 on Heroku
 
-## TODO
+## Objects
 
-- [ ] Have typo detection / more robust trigger questions
-- [X] Spells module
-    - [X] More rubust searching
-    - [X] Updated db to include elemental evil
-- [X] Resource module for keeping track of gold and flirts
-- [ ] Update personality module to know peoples names and birthdays etc.
-- [ ] reminders
-- [X] DICE ROLLING MODULE OBVIOUSLY
-- [ ] module to generate html character sheet?
-    - [ ] Let people take damage / roll dice!!!
-- [ ] Let hodge podge google shit
-- [ ] Let hodge podge respond to "who do you work for"
-- [ ] Let hodge podge respond to "what is love"
+Run will forward messages to all bots it knows about
+Bots have a list of modules.
+Each module has a set of triggers that it registers with the bots parser.
+on a message the parser produces a match object which maps the input string to
+a function in a module.
+the bot then will trigger the module to process the input and then give the module
+the client object so it can respond if it needs to.

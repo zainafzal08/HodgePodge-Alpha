@@ -1,3 +1,3 @@
 export BOT_TOKEN="Mzk1MzgyNzA0OTYwNzAwNDE2.DSSITw.Te0v0ti0k_xkpxG-vxqm-tKQVZs"
 export DATABASE_URL="postgres://aeopzpujogcyeq:449024c98f6747c7d3eb1582dff0bf38c0cb1b7db5c8aba07809df8590dbd113@ec2-54-227-247-225.compute-1.amazonaws.com:5432/d1hh280kc27pls"
-python3 test.py
+python3 bots/HodgePodge.py
