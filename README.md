@@ -14,3 +14,9 @@ on a message the parser produces a match object which maps the input string to
 a function in a module.
 the bot then will trigger the module to process the input and then give the module
 the client object so it can respond if it needs to.
+
+
+## ToDo
+
+1. add in voice channel triggers (https://github.com/Rapptz/discord.py/blob/async/examples/playlist.py)
+2. Redo all this shit
