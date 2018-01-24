@@ -30,6 +30,8 @@ def accessLevel(channel, person):
         return 2
     elif "Hodge Podge Wrangler" in roles:
         return 1
+    elif "Robot-Whisperer" in roles:
+        return 1
     else:
         return 0
 
