@@ -20,6 +20,11 @@ class Db():
         return result
 
     def formStrictFilters(self, r, query, caseIns):
+        if "WHERE" not in r:
+            return query
+        elif len(r["WHERE"].keys()) < 1:
+            return return query
+
         query += " WHERE "
         for i,fil in enumerate(r["WHERE"].keys()):
             if i == 0 and caseIns:
@@ -33,6 +38,10 @@ class Db():
         return query
 
     def formSearchFilters(self, r, query, caseIns):
+        if "WHERE" not in r:
+            return (query,[])
+        elif len(r["WHERE"].keys()) < 1:
+            return return (query,[])
         query += " WHERE "
         for i,fil in enumerate(r["WHERE"].keys()):
             if i == 0 and caseIns:
@@ -54,13 +63,11 @@ class Db():
         query = formStrictFilters(r,query,True)
         c = self.conn.cursor()
         c.execute(query)
-        if c.fetchone() != None:
-            return False
-        else:
+        if c.fetchone():
             return True
+        return False
 
     def edit(self, r):
-
         # basic params
         c = self.conn.cursor()
         force = r.get("FORCE",False)
@@ -72,11 +79,27 @@ class Db():
         fields = ", ".join(fields)
         table = r["TABLE"]
         exists = self.exists(table,fields,r)
-
+        old = None
+        new = None
         if exists:
-
+            for i,f in enumerate(map(lambda x: x.upper(), r["SET"])):
+                fieldPairs.append("%s = %s"%(f,r["VALUE"][i]))
+            fieldPairs = ",".join(fieldPairs)
+            query = "UPDATE %s SET %s"%(table,fieldPairs)
+            query = formStrictFilters(r,query,True)
+            oldQuery = "SELECT * FROM %s"%table
+            oldQuery = formStrictFilters(r,oldQuery,True)
+            old = c.execute(oldQuery)
+            c.execute(query)
+            self.conn.commit()
         elif not exists and force:
-
+            cols = map(lambda x: x.upper(), r["SET"])
+            query = "INSERT INTO %s (%s) VALUES (%s)"%(table,", ".join(cols),", ".join(r["VALUES"]))
+            self.c.execute(query)
+            self.conn.commit()
+            newQuery = "SELECT * FROM %s"%table
+            newQuery = formStrictFilters(r,newQuery,True)
+            new = c.execute(newQuery)
         else:
             raise Exception("No Matching Entry To Update, Use force=true To Create Entry")
 
@@ -101,10 +124,10 @@ class Db():
         params = None
 
         # form filters
-        if "WHERE" in r and len(r["WHERE"].keys()) > 0:
-            filters = self.formSearchFilters(r,query, caseIns)
-            query = filters[0]
-            params = filters[1]
+        filters = self.formSearchFilters(r,query, caseIns)
+        query = filters[0]
+        params = filters[1]
+
         # Execute
         if params != None
             c.execute(query,tuple(params))
@@ -132,8 +155,8 @@ class Db():
         query = "SELECT %s FROM %s"%(fields, table)
 
         # form filters
-        if "WHERE" in r and len(r["WHERE"].keys()) > 0:
-            query = self.formStrictFilters(query, caseIns)
+        query = self.formStrictFilters(query, caseIns)
+
         # Execute
         c.execute(query)
         results = c.fetchAll()

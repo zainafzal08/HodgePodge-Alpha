@@ -11,24 +11,26 @@ class Game(Module):
         self.db = None
         self.formatter = Formatter()
         self.triggerList.append({
-            "trigger":"hodge podge roll a d\d+\s*$",
+            "trigger":"hodge podge roll a (d\d+)\s*$",
             "function":self.roll,
             "accessLevel": 0
             })
         self.triggerList.append({
-            "trigger": "hodge podge roll \d+ d\d+s?\ss*$",
+            "trigger": "hodge podge roll (\d+) (d\d)+s?\ss*$",
             "function": self.multiRoll,
             "accessLevel": 0
             })
         self.triggerList.append({
-            "trigger": "hodge podge give .* \d+ .* points?\s*$",
+            "trigger": "hodge podge give (.*) (\d+) (.*) points?\s*$",
             "function": self.editPoints,
-            "accessLevel": self.scoreEditLevel
+            "accessLevel": self.scoreEditLevel,
+            "id": 0
             })
         self.triggerList.append({
-            "trigger": "hodge podge take \d+ .* points? from .*\s*$",
+            "trigger": "hodge podge take (\d+) (.*) points? from (.*)\s*$",
             "function": self.editPoints,
-            "accessLevel": self.scoreEditLevel
+            "accessLevel": self.scoreEditLevel,
+            "id": 1
             })
         self.triggerList.append({
             "trigger": "hodge podge list all score types\s*$",
@@ -36,7 +38,7 @@ class Game(Module):
             "accessLevel": self.scoreEditLevel
             })
         self.triggerList.append({
-            "trigger": "hodge podge summerise .* points?\s*$",
+            "trigger": "hodge podge summerise (.*) points?\s*$",
             "function": self.getPoints,
             "accessLevel": self.scoreEditLevel
             })
@@ -45,10 +47,13 @@ class Game(Module):
         self.db = db
 
     def getTriggerList(self):
-        return triggerList;
+        return triggerList
 
-    def respond(self, client):
-        self.formatter.flush(client)
+    def respond(self, client, channel):
+        if client:
+            self.formatter.flush(client, channel)
+        else:
+            self.formatter.consoleFlush()
 
     def multiRoll(self, trigger):
         args = trigger["args"]
@@ -76,7 +81,7 @@ class Game(Module):
 
     def editPoints(self, trigger):
         args = trigger["args"]
-        match = trigger["match"]
+        match = trigger["id"]
 
         if match == 0:
             s = s1
