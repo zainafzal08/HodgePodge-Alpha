@@ -19,6 +19,7 @@ class Db():
             result.append(curr)
             curr = c.fetchone()
         return result
+
     def removeDuplicates(self, l, i):
         seen = []
         s = []
@@ -29,6 +30,27 @@ class Db():
                 seen.append(e[i])
                 s.append(e)
         return s
+
+    def newTrack(self, url, track):
+        c = self.conn.cursor()
+        c.execute("SELECT * FROM TRACKS WHERE URL = %s",(url,))
+        t = c.fetchone()
+        if t:
+            return t[1]
+        c.execute("INSERT INTO TRACKS VALUES(%s,%s)",(url,track))
+        self.conn.commit()
+        return None
+
+
+    def getTrack(self, track):
+        c = self.conn.cursor()
+        c.execute("SELECT * FROM TRACKS WHERE TRACK = %s",(track,))
+        t = c.fetchone()
+        if t:
+            return t[0]
+        else:
+            return None
+
     def getAllMemes(self, channel):
         c = self.conn.cursor()
         c.execute("SELECT * FROM MEMES WHERE CHANNEL = %s",(channel,))
