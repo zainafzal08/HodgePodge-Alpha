@@ -12,8 +12,7 @@ class Memes(Module):
             ("hodge podge override list channels$",self.listChannels),
             ("hodge podge override on channel \w+ on .+ say .+$",self.overrideNewMeme),
             ("hodge podge override on channel \w+ list memes",self.overrideListMeme),
-            ("hodge podge override on channel \w+ kill .+$",self.overrideKillMeme),
-            ("hodge podge cycle image", self.cycleImage)
+            ("hodge podge override on channel \w+ kill .+$",self.overrideKillMeme)
         ]
         self.db = db
 

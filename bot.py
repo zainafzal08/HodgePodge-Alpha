@@ -12,7 +12,7 @@ from modules.SoundBoard import SoundBoard
 # Globals
 client = discord.Client()
 superAdmins = ["330337388196790284","182968035819126784"]
-debug = True
+debug = False
 silence = False
 player = None
 vc = None
