@@ -2,3 +2,4 @@ libav-tools
 libopus-dev
 libffi-dev
 libsodium-dev
+libglu1
