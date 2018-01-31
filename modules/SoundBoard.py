@@ -7,7 +7,7 @@ class SoundBoard(Module):
         super().__init__("SoundBoard")
         self.commands = [
             ("hodge podge play (.*)$", self.playSound),
-            ("hodge podge stop playing$", self.endSound),
+            ("hodge podge stop$", self.endSound),
             ("hodge podge leave$", self.byebye),
             ("hodge podge remember (.*) as (.*)$", self.register)
         ]
