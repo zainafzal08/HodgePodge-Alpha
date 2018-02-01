@@ -9,7 +9,8 @@ class SoundBoard(Module):
             ("hodge podge play (.*)$", self.playSound),
             ("hodge podge stop$", self.endSound),
             ("hodge podge leave$", self.byebye),
-            ("hodge podge remember (.*) as (.*)$", self.register)
+            ("hodge podge remember (.*) as (.*)$", self.register),
+            ("hodge podge quickplay (.*)$", self.quickPlay),
         ]
         self.db = db
 
@@ -25,6 +26,16 @@ class SoundBoard(Module):
             res["output"].append("I already have a name for that link! (%s)"%err)
         else:
             res["output"].append("Got it!")
+        return res
+
+    def quickPlay(self, message, level):
+        if level < 2:
+            return
+        res = super().blankRes()
+        s = re.search("hodge podge quickplay (.*)$",self.clean(message.content))
+        track = self.shallowClean(s.group(1))
+        res["output"].append("Attempting to play given link")
+        res["audio"] = track
         return res
 
     def playSound(self, message, level):
