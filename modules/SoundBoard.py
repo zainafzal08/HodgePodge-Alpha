@@ -10,7 +10,7 @@ class SoundBoard(Module):
             ("hodge podge stop$", self.endSound),
             ("hodge podge leave$", self.byebye),
             ("hodge podge remember (.*) as (.*)$", self.register),
-            ("hodge podge quickplay (.*)$", self.quickPlay),
+            ("hodge podge quickplay (.*)$", self.quickPlay)
         ]
         self.db = db
 
@@ -34,7 +34,7 @@ class SoundBoard(Module):
         res = super().blankRes()
         s = re.search("hodge podge quickplay (.*)$",self.clean(message.content))
         track = self.shallowClean(s.group(1))
-        res["output"].append("Attempting to play given link")
+        res["output"].append("Attempting to play %s"%track)
         res["audio"] = track
         return res
 
