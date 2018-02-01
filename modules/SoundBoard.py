@@ -32,7 +32,7 @@ class SoundBoard(Module):
         if level < 2:
             return
         res = super().blankRes()
-        s = re.search("hodge podge quickplay (.*)$",self.clean(message.content))
+        s = re.search("hodge podge quickplay (.*)$",self.shallowClean(message.content))
         track = self.shallowClean(s.group(1))
         res["output"].append("Attempting to play %s"%track)
         res["audio"] = track
