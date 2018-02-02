@@ -42,7 +42,7 @@ class SoundBoard(Module):
         if level < 2:
             return
         res = super().blankRes()
-        s = re.search("hodge podge play (.*)$",self.clean(message.content))
+        s = re.search("hodge podge play (.*)$",self.shallowClean(message.content))
         sound = self.shallowClean(s.group(1))
         track = self.db.getTrack(sound)
         if not track:
