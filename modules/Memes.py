@@ -139,7 +139,7 @@ class Memes(Module):
         res = super().blankRes()
         channel = s.group(1).strip()
         phrase = s.group(2)
-        res["channel_output_targer"] = channel
+        res["channel_output_target"] = channel
         res["channel_output"] = phrase
         return res
 
