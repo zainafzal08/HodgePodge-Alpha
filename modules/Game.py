@@ -22,7 +22,7 @@ class Game(Module):
         count = int(s.group(1))
         d = int(s.group(2))
         res = super().blankRes()
-        if d > 1000 or count > 100:
+        if d > 1000 or count > 1000:
             res["output"].append("Sorry friend! That number is too big")
         else:
             roll = 0
