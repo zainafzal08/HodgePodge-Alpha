@@ -12,7 +12,8 @@ class Memes(Module):
             ("hodge podge override list channels$",self.listChannels),
             ("hodge podge override on channel \w+ on .+ say .+$",self.overrideNewMeme),
             ("hodge podge override on channel \w+ list memes",self.overrideListMeme),
-            ("hodge podge override on channel \w+ kill .+$",self.overrideKillMeme)
+            ("hodge podge override on channel \w+ kill .+$",self.overrideKillMeme),
+            ("hodge podge override on channel \w+ say .+$", self.say)
         ]
         self.db = db
 
@@ -129,6 +130,17 @@ class Memes(Module):
             res["output"].append("Sorry Friend! I don't know that phrase!")
         else:
             res["output"].append("**poof** It's gone!")
+        return res
+
+    def say(self, message, level):
+        if level < 2:
+            return
+        s = re.search("hodge podge override on channel (\w+) say (.+)$",self.shallowClean(message.content),flags=re.IGNORECASE)
+        res = super().blankRes()
+        channel = s.group(1).strip()
+        phrase = s.group(2)
+        res["channel_output_targer"] = channel
+        res["channel_output"] = phrase
         return res
 
     def newMeme(self, message, level):

@@ -48,6 +48,11 @@ async def respond(message, res):
         for line in res['output']:
             await client.send_message(message.channel, line)
 
+async def channelOutput(message, res):
+    if silence:
+        return
+    await client.send_message(res["channel_output_target"], res["channel_output"])
+
 def load_opus_lib():
     if discord.opus.is_loaded():
         return True
@@ -132,6 +137,8 @@ async def on_message(message):
                 await stopAudio(message)
             if "disconnect" in res and res["disconnect"]:
                 await disconnectAudio(message)
+            if len(res["channel_output"]) > 0:
+                await channelOutput(res)
         except Exception as e:
             modules[1].crashes+=1
             await moduleErr(message,module.name,str(e))
