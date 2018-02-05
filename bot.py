@@ -51,7 +51,7 @@ async def respond(message, res):
 async def channelOutput(message, res):
     if silence:
         return
-    await client.send_message(discord.find(lambda c: c.id == res["channel_output_target"], client.get_all_channels()), res["channel_output"])
+    await client.send_message(discord.utils.find(lambda c: c.id == res["channel_output_target"], client.get_all_channels()), res["channel_output"])
 
 def load_opus_lib():
     if discord.opus.is_loaded():
