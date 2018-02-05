@@ -138,7 +138,7 @@ async def on_message(message):
             if "disconnect" in res and res["disconnect"]:
                 await disconnectAudio(message)
             if len(res["channel_output"]) > 0:
-                await channelOutput(res)
+                await channelOutput(message,res)
         except Exception as e:
             modules[1].crashes+=1
             await moduleErr(message,module.name,str(e))
