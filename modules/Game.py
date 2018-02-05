@@ -32,7 +32,11 @@ class Game(Module):
                 roll += r
                 components.append(str(r))
             roll = str(roll)
-            res["output"].append("I got "+roll+"! ("+"+".join(components)+")")
+            componentString = "+".join(components)
+            if len(components) > 100:
+                res["output"].append("I got "+roll+"!")
+            else:
+                res["output"].append("I got "+roll+"! ("+componentString+")")
         return res
 
     def roll(self, message, level):
