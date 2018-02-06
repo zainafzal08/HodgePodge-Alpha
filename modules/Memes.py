@@ -13,13 +13,28 @@ class Memes(Module):
             ("hodge podge override on channel \w+ on .+ say .+$",self.overrideNewMeme),
             ("hodge podge override on channel \w+ list memes",self.overrideListMeme),
             ("hodge podge override on channel \w+ kill .+$",self.overrideKillMeme),
-            ("hodge podge override on channel \w+ say .+$", self.say)
+            ("hodge podge override on channel \w+ say .+$", self.say),
+            ("hodge podge nickname \w+ as \w+$",self.newNickName)
         ]
         self.db = db
 
+    def newNickName(self, message, level):
+        if level < 2:
+            return
+        s = re.search("hodge podge nickname (\w+) as (.+)",self.shallowClean(message.content),flags=re.IGNORECASE)
+        channel = s.group(1).strip()
+        nick = s.group(2).strip()
+        err = self.db.newNickname(channel,nick)
+        res = super().blankRes()
+        if err:
+            res["output"].append("I already know that nickname sorry!")
+        else:
+            res["output"].append("Got it!")
+        return res
+
     def clean(self, t):
         m = t.lower()
-        m = re.sub(r'[\,\.\?\;\%\#\@\!\^\&\*\+\-\+\_\~\']','',m)
+        m = re.sub(r'[\,\.\?\;\%\#\@\^\&\*\+\-\+\~\']','',m)
         m = re.sub(r'\s+',' ',m)
         m = m.strip()
         return m
@@ -177,8 +192,16 @@ class Memes(Module):
         res["output"].append("\n".join(response))
         return res
 
+    def shortcut(self, n):
+        c = self.db.nickToChannel(n)
+        if c == None:
+            return "!"+n
+        return "hodge podge override on channel %s"%c
+
     def trigger(self, message, requestLevel):
         res = None
+        if(message.content[0] == "!"):
+            message.content = re.sub(message.content.split(" ")[0],self.shortcut(message.content.split(" ")[0][1:]),message.content)
         m = self.clean(message.content)
         for command in self.commands:
             if re.search(command[0],m):

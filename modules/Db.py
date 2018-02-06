@@ -31,6 +31,24 @@ class Db():
                 s.append(e)
         return s
 
+    def newNickname(self, chnl, n):
+        c = self.conn.cursor()
+        c.execute("SELECT * FROM NICKNAMES WHERE NICKNAME = %s",(n,))
+        t = c.fetchone()
+        if t:
+            return True
+        c.execute("INSERT INTO NICKNAMES VALUES(%s,%s)",(chnl,n))
+        self.conn.commit()
+        return False
+
+    def nickToChannel(self, n):
+        c = self.conn.cursor()
+        c.execute("SELECT CHANNEL FROM NICKNAMES WHERE NICKNAME = %s",(n,))
+        r = c.fetchone()
+        if r:
+            return r[0]
+        else:
+            return None
     def newTrack(self, url, track):
         c = self.conn.cursor()
         c.execute("SELECT * FROM TRACKS WHERE URL = %s",(url,))
