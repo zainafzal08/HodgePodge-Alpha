@@ -200,7 +200,7 @@ class Memes(Module):
 
     def trigger(self, message, requestLevel):
         res = None
-        if(message.content[0] == "!"):
+        if len(message.content) > 0 and message.content[0] == "!":
             message.content = re.sub(message.content.split(" ")[0],self.shortcut(message.content.split(" ")[0][1:]),message.content)
         m = self.clean(message.content)
         for command in self.commands:
