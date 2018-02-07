@@ -67,7 +67,7 @@ class Game(Module):
             scoreType = self.shallowClean(s.group(2))
 
         person = None
-        if len(message.mentions) != None:
+        if len(message.mentions) != 0:
             person = message.mentions[0]
         res = super().blankRes()
 
