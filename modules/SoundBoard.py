@@ -1,6 +1,9 @@
 from modules.Module import Module
 import discord
 import re
+import lxml
+from lxml import etree
+import urllib.request
 
 class SoundBoard(Module):
     def __init__(self, db):
@@ -10,9 +13,35 @@ class SoundBoard(Module):
             ("hodge podge stop$", self.endSound),
             ("hodge podge leave$", self.byebye),
             ("hodge podge remember (.*) as (.*)$", self.register),
-            ("hodge podge quickplay (.*)$", self.quickPlay)
+            ("hodge podge quickplay (.*)$", self.quickPlay),
+            ("hodge podge list tracks$",self.listTracks),
+            ("hodge podge volume \d+$",self.volume),
         ]
         self.db = db
+
+    def volume(self, message, level):
+        if level < 2:
+            return
+        s = re.search("hodge podge volume (\d+(.\d+)?)$",message.content)
+        vol = float(s.group(1))
+        res = super().blankRes()
+        res["audioVol"] = vol
+        return res
+
+    def listTracks(self, message, level):
+        if level < 2:
+            return
+        res = super().blankRes()
+        result = []
+        result.append("Here are all my Tracks!")
+        i = 0
+        result.append("```")
+        for track in self.db.allTracks():
+            result.append("%4d : %s"%(i, track[1]))
+            i+=1
+        result.append("```")
+        res["output"].append("\n".join(result))
+        return res
 
     def register(self, message, level):
         if level < 2:

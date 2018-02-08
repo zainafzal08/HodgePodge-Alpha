@@ -58,7 +58,10 @@ class Db():
         c.execute("INSERT INTO TRACKS VALUES(%s,%s)",(url,track))
         self.conn.commit()
         return None
-
+    def allTracks(self):
+        c = self.conn.cursor()
+        c.execute("SELECT * FROM TRACKS")
+        return self.fetchAll(c)
 
     def getTrack(self, track):
         c = self.conn.cursor()

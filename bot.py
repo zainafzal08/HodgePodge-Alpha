@@ -90,6 +90,15 @@ async def playAudio(message, url):
     player = await vc.create_ytdl_player(url)
     player.start()
 
+async def audioVol(message, vol):
+    if player and player.is_playing():
+        if vol <= 1 and vol >= 0:
+            player.volume = vol
+        else:
+            await client.send_message(message.channel, "Invalid Volume ya _fuckface_")
+    else:
+        await client.send_message(message.channel, "Audio is not currently playing!")
+
 async def disconnectAudio(message):
     global player
     global vc
@@ -137,6 +146,8 @@ async def on_message(message):
                 await stopAudio(message)
             if "disconnect" in res and res["disconnect"]:
                 await disconnectAudio(message)
+            if "audioVol" in res:
+                await audioVol(message,res["audioVol"])
             if len(res["channel_output"]) > 0:
                 await channelOutput(message,res)
         except Exception as e:
