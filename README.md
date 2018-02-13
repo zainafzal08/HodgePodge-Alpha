@@ -73,7 +73,7 @@ This allows you to insert or update information in a tables
 | FORCE  | bool | If the row doesn't exist to be updated should it be inserted? |
 
 example:
-```
+```python
 request = {
     "TABLE": "SCORES"
     "SET": ["SCORE"],
@@ -103,7 +103,7 @@ This allows you to query information in a table
 | CASE_INS | bool | If the search should be case insensitive on the WHERE fields  |
 
 example:
-```
+```python
 request = {
     "TABLE": "SCORES",
     "GET": ["TYPE"],
@@ -131,7 +131,7 @@ it is also puncuation sensitive but you can ask it to ignore full stops etc.
 #### Trigger Request Objects
 
 A sample trigger request may be
-```
+```python
 {
 "trigger": "hodge podge take (\d+) (.*) points? from (.*)\s*$",
 "function": self.editPoints,
