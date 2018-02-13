@@ -5,3 +5,5 @@ class Module():
         return []
     def connectDb(self, db):
         return
+    def respond(self, client, channel):
+        return
