@@ -65,7 +65,7 @@ class Game(Module):
         obj = {}
         obj["cmds"] = res
         # TODO: put in docs
-        obj["docs"] = "lol whoops"
+        obj["docs"] = "https://github.com/zainafzal08/HodgePodge/blob/dev/bots/HodgePodge/docs/main.md#game"
 
     def multiRoll(self, trigger):
         # TODO: get the nice formatted output from master

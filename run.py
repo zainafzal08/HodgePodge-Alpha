@@ -25,10 +25,10 @@ def helpCmd(channel, m):
         response.append("%s"%l[1])
         response.append("`%s`"%l[2])
         response.append("")
-    response.append("Check out the documentation if you want some more info! %s"%helpObj["docs"])
+    response.append("Check out the documentation if you want some more info!\n%s"%helpObj["docs"])
     response = "\n".join(response)
     if(len(response) > 2000):
-        await client.send_message(channel, "There are a tad too many commands in that module for me to give you here! Try checking out the documentation here!: %s"%helpObj["docs"])
+        await client.send_message(channel, "There are a tad too many commands in that module for me to give you here! Try checking out the documentation here\n%s"%helpObj["docs"])
     else:
         await client.send_message(channel, response)
 
