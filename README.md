@@ -1,7 +1,6 @@
-# HodgePodge
+# Bot Party
 
-A small discord bot to be sweet, keep track of Dnd rescoures, send memes and help you search spells.
-Inspired by TAZ!
+A wonderful modular system built in python that lets you construct bots which can use databases, respond to inputs play music and more!
 
 Hosted with <3 on Heroku
 
@@ -15,28 +14,21 @@ a function in a module.
 the bot then will trigger the module to process the input and then give the module
 the client object so it can respond if it needs to.
 
-## Access levels
+## Bots
 
-Every user in every server with the chat has a access level. By default this is `0`
-If the user has a known admin/maintence role such as `bot-boys` they will be elevated to
-level `1`.
-if the user is a super admin, i.e one of the engineering or testing crew,
-they will be elevated to level `2`
-
-This is calculated on a per message basis to allow the run system to only trigger
-commands that a user is allowed to use.
-
-If you want to have a role added or to become a super admin contact zain.afz@gmail.com
-
-Note that commands that allow you to see information outside of your server i.e
-commands that let you change points for a player in another server, should be
-level `2` commands. the level `1` status is designed for people to have power over
-the bot within the bounds of their server.
-Any more power should only be afforded to development teams.
+the rest of this documentation will describe how to build a module for a bot. To build a bot
+you just have to have a class with 1 input into the constructor which will be the discord client object, a getHelp method and the talk method.
+The talk method will take in a discord message object and do what it pleases with that information, printing out stuff when it's ready to respond. How it does it is up to you but take a look at HodgePodge for some ideas. There is a section in this document on Utility classes provided to help with parsing commands and formatting output.
+The getHelp method can just return None if you do not want any help messages for your bots modules.
+otherwise it must return a help object with 2 fields. `cmds` which is a list of tuples each with 3 fields, the
+command, the
 
 ## Module Structure
 
 Modules are independent pieces of logic that ate triggered by input and can respond.
+You _can_ make your own to suit your own bot but this system works well
+Just inherent from the Module class and read below.
+
 Every module needs to have 3 functions defined
 
 1. connectDb
@@ -52,7 +44,16 @@ Every module needs to have 3 functions defined
 This is the bear minimum, of course you will need to define functions that will be triggered.
 See the parser documentation for more info.
 
-## Data base
+You can also add in some optional functions if you so choose
+
+1. getHelp
+  - you only need this function if you use the same setup for the reccomended bot getHelp command
+  - this must return a list of tuples with 3 strings, the command structure, a description of the command, and a example command
+  - this will be formatted and sent to a chat if someone types in "<bot name> help with <module name>"
+
+## Utility classes
+
+#### Data base
 
 The database is very generic, It's mostly just a wrapper over the actual sql
 statements sent to the server. This does allow any module to use the db without having
@@ -121,14 +122,13 @@ This is the same as `get` but sanitises all input and looks for close sub string
 matches rather then direct matches so you can pipe user search terms into the
 database directly to find matches.
 
-
-## Parser
+#### Parser
 
 This is the system which parses input messages against all known triggers and
-informs the relevant. Note that the parser by default is case insensitive.
+informs the relevant. Note that the parser is case insensitive.
 it is also puncuation sensitive but you can ask it to ignore full stops etc.
 
-#### Trigger Request Objects
+*Trigger Request Objects*
 
 A sample trigger request may be
 ```python
@@ -156,7 +156,7 @@ ignore is a set of characters to remove from the message before attempting to ma
 this is useful if you would like `hi!` `hi` `hi.` all to trigger a function as you
 could set ignore to be `[',','.','!']`
 
-#### Trigger functions
+*Trigger functions*
 
 Within the module object you must have functions that match the ones that you put
 into the trigger request objects.
@@ -171,3 +171,10 @@ it contains the following fields
 | ----- | ---- | -----------------------------------------------------------------------------|
 | args  | list | The list of matched groups from the request regex                            |
 | id    | str  | The id of the trigger request this matched against (None if no id was given) |
+
+*Formatter*
+
+This just lets you put in lists and things to print out into a buffer and flush them out using a default
+pattern in your bot's respond object.
+
+The code is very self explantory, the real use of the formatter is consistent response styles from the bot and a clean buffer to work with our output dynamically across functions and locations in call cycles.

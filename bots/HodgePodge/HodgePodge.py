@@ -1,7 +1,7 @@
-from ../tools/Db import Db
-from ../tools/Parser import Parser
-from ../tools/Formatter import Formatter
-
+from ../../utils/Db import Db
+from ../../utils/Parser import Parser
+from ../../utils/Formatter import Formatter
+from modules/Game import Game
 
 class HodgePodge():
     def __init__(self, client):
@@ -10,6 +10,7 @@ class HodgePodge():
             ("Hodge Podge Wrangler",1),
             ("Robo-Boys",1)
         ]
+        self.name = ""
         self.db = Db()
         self.parser = Parser()
         self.client = client
@@ -22,7 +23,15 @@ class HodgePodge():
             for trigger in module.getTriggerList():
                 self.parser.register(module, trigger)
 
-    def accessLevel(person):
+    def getHelp(self, moduleName):
+        result = None
+        for module in self.modules:
+            if module.name == moduleName:
+                result = module.getHelp()
+                break
+        return result
+
+    def accessLevel(self,person):
         memberRoles = list(map(lambda x: x.name, person.roles))
         if person.id in self.superAdmins:
             return 2
