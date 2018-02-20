@@ -1,8 +1,7 @@
 # Hodge Podge Documentation!
 
 A small discord bot to be sweet, keep track of Dnd rescoures, send memes and help you search spells.
-Inspired by TAZ! Hodge podge by default doesn't do anything but keep track of it's users and their
-access levels. But when you start adding in modules he becomes very fun!
+Inspired by TAZ!
 
 ## Access levels
 

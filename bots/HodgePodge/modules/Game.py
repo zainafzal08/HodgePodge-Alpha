@@ -54,6 +54,7 @@ class Game(Module):
             self.formatter.flush(client, channel)
         else:
             self.formatter.consoleFlush()
+
     def getHelp(self):
         res = []
         res.append(("hodge podge roll a d<X>","Have hodge podge roll a dice! supports d1 to d1000","hodge podge roll a d20"))
@@ -64,7 +65,6 @@ class Game(Module):
         res.append(("hodge podge summerise <T> points","List all users and their scores (if they have scores) for score type <T>","hodge podge summerise xp points"))
         obj = {}
         obj["cmds"] = res
-        # TODO: put in docs
         obj["docs"] = "https://github.com/zainafzal08/HodgePodge/blob/dev/bots/HodgePodge/docs/main.md#game"
 
     def multiRoll(self, trigger):

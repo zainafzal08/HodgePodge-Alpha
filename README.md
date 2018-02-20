@@ -4,6 +4,7 @@ A wonderful modular system built in python that lets you construct bots which ca
 
 Hosted with <3 on Heroku
 
+
 ## shit
 
 Run will forward messages to all bots it knows about
@@ -25,8 +26,8 @@ command, the
 
 ## Module Structure
 
-Modules are independent pieces of logic that ate triggered by input and can respond.
-You _can_ make your own to suit your own bot but this system works well
+Modules are independent pieces of logic that are triggered by input and can respond.
+You _can_ make your own to suit your own bot but this system works well if you choose to use the parser.
 Just inherent from the Module class and read below.
 
 Every module needs to have 3 functions defined
@@ -48,8 +49,8 @@ You can also add in some optional functions if you so choose
 
 1. getHelp
   - you only need this function if you use the same setup for the reccomended bot getHelp command
-  - this must return a list of tuples with 3 strings, the command structure, a description of the command, and a example command
-  - this will be formatted and sent to a chat if someone types in "<bot name> help with <module name>"
+  - this must return a help obj with a list of tuples with 2 fields + 1 optional field under the name "cmds" and a link to a full documentation website/file under "docs". cmds are composed of The command, an description and a optional description.
+  - This will be formatted and sent to a chat if someone types in "<bot name> help with <module name>"
 
 ## Utility classes
 
