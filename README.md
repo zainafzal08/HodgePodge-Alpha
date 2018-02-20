@@ -40,7 +40,7 @@ Every module needs to have 3 functions defined
   detect when the module must be notified of a event and what information it needs
 3. respond
   - Once the module has been triggered it will be given the client and channel it was triggered in
-  so it can respond. You can do this manually but using the formatter helper class is advised
+  so it can respond. It will also be given a context object which gives some info on in what context you are being triggered in (see parser for more info). You can respond manually but using the formatter helper class is advised
 
 This is the bear minimum, of course you will need to define functions that will be triggered.
 See the parser documentation for more info.
@@ -134,11 +134,11 @@ it is also puncuation sensitive but you can ask it to ignore full stops etc.
 A sample trigger request may be
 ```python
 {
-"trigger": "hodge podge take (\d+) (.*) points? from (.*)\s*$",
-"function": self.editPoints,
-"accessLevel": self.scoreEditLevel,
-"id": 1,
-"ignore": ['.',',']
+  "trigger": "hodge podge take (\d+) (.*) points? from (.*)\s*$",
+  "function": self.editPoints,
+  "accessLevel": self.scoreEditLevel,
+  "id": 1,
+  "ignore": ['.',',']
 })
 ```
 
@@ -164,7 +164,7 @@ into the trigger request objects.
 They must match the prototype `def <f>(self, trigger)` where `trigger` is the
 trigger object.
 
-the trigger object is how the parser tells your module of the context of it's activation.
+The trigger object is how the parser tells your module of the context of it's activation.
 
 it contains the following fields
 
@@ -172,6 +172,7 @@ it contains the following fields
 | ----- | ---- | -----------------------------------------------------------------------------|
 | args  | list | The list of matched groups from the request regex                            |
 | id    | str  | The id of the trigger request this matched against (None if no id was given) |
+
 
 *Formatter*
 
