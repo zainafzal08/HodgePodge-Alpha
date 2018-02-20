@@ -33,7 +33,7 @@ def accessLevel(channel, person):
     roles = list(map(lambda x: x.name, person.roles))
     if person.id in superAdmins:
         return 2
-    elif "Hodge Podge Wrangler" in roles:
+    elif "Hodge Podge Rangler" in roles:
         return 1
     elif "Robot-Whisperer" in roles:
         return 1
@@ -44,7 +44,7 @@ def accessLevel(channel, person):
 async def respond(message, res):
     if silence:
         return
-    if res['output'] != None:
+    if res != None and res['output'] != None:
         for line in res['output']:
             await client.send_message(message.channel, line)
 
