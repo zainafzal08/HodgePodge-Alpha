@@ -20,7 +20,7 @@ class SoundBoard(Module):
         self.db = db
 
     def volume(self, message, level):
-        if level < 2:
+        if level < 1:
             return
         s = re.search("hodge podge volume (\d+(.\d+)?)$",message.content)
         vol = float(s.group(1))
@@ -29,7 +29,7 @@ class SoundBoard(Module):
         return res
 
     def listTracks(self, message, level):
-        if level < 2:
+        if level < 1:
             return
         res = super().blankRes()
         result = []
@@ -58,7 +58,7 @@ class SoundBoard(Module):
         return res
 
     def quickPlay(self, message, level):
-        if level < 2:
+        if level < 1:
             return
         res = super().blankRes()
         s = re.search("hodge podge quickplay (.*)$",self.shallowClean(message.content))
@@ -68,7 +68,7 @@ class SoundBoard(Module):
         return res
 
     def playSound(self, message, level):
-        if level < 2:
+        if level < 1:
             return
         res = super().blankRes()
         s = re.search("hodge podge play (.*)$",self.shallowClean(message.content))
@@ -83,14 +83,14 @@ class SoundBoard(Module):
         return res
 
     def endSound(self, message, level):
-        if level < 2:
+        if level < 1:
             return
         res = super().blankRes()
         res["killAudio"] = True
         return res
 
     def byebye(self, message, level):
-        if level < 2:
+        if level < 1:
             return
         res = super().blankRes()
         res["output"] .append("Goodbye!")
