@@ -1,7 +1,7 @@
-from ../../utils/Db import Db
-from ../../utils/Parser import Parser
-from ../../utils/Formatter import Formatter
-from modules/Game import Game
+from utils.Db import Db
+from utils.Parser import Parser
+from utils.Formatter import Formatter
+from bots.HodgePodge.modules.Game import Game
 
 class HodgePodge():
     def __init__(self, client):
@@ -40,10 +40,10 @@ class HodgePodge():
                 return r[1]
         return 0
 
-    def talk(self, message):
+    async def talk(self, message):
         level = self.accessLevel(message.author)
         matches = self.parser.parse(message, level)
         for match in matches:
             match.trigger()
         for match in matches:
-            match.respond(self.client,message.channel)
+            await match.respond(self.client,message.channel)

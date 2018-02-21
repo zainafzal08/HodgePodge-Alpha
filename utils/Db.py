@@ -23,14 +23,14 @@ class Db():
         if "WHERE" not in r:
             return query
         elif len(r["WHERE"].keys()) < 1:
-            return return query
+            return query
 
         query += " WHERE "
         for i,fil in enumerate(r["WHERE"].keys()):
             if i == 0 and caseIns:
-                query += (" UPPER(%s) = %s"%(fil,r["WHERE"][fil].upper())
+                query += (" UPPER(%s) = %s"%(fil,r["WHERE"][fil].upper()))
             elif caseIns:
-                query += (" AND UPPER(%s) = %s"%(fil,r["WHERE"][fil].upper())
+                query += (" AND UPPER(%s) = %s"%(fil,r["WHERE"][fil].upper()))
             elif i == 0:
                 query += (" %s = %s"%(fil,r["WHERE"][fil]))
             else:
@@ -41,7 +41,7 @@ class Db():
         if "WHERE" not in r:
             return (query,[])
         elif len(r["WHERE"].keys()) < 1:
-            return return (query,[])
+            return (query,[])
         query += " WHERE "
         for i,fil in enumerate(r["WHERE"].keys()):
             if i == 0 and caseIns:
@@ -129,7 +129,7 @@ class Db():
         params = filters[1]
 
         # Execute
-        if params != None
+        if params != None:
             c.execute(query,tuple(params))
         else:
             c.execute(query)

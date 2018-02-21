@@ -4,12 +4,14 @@ class Formatter():
     def consoleFlush(self):
         for l in self.buffer:
             print(l)
-    def flush(self, client, channel):
+        self.buffer.clear()
+    async def flush(self, client, channel):
         final = "\n".join(self.buffer)
         if len(final) > 2000:
             msg = "... There was more but i can only send 2000 characters at a time!"
-            final = final[0:1995-len(msg)]+msg
+            final = final[0:(1995-len(msg))]+msg
         await client.send_message(channel, final)
+        self.buffer.clear()
     def output(self, s):
         self.buffer.append(s)
     def error(self, s):

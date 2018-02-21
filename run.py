@@ -2,15 +2,16 @@ import discord
 import asyncio
 import os
 import re
-from bots/HodgePodge/HodgePodge import HodgePodge
+from bots.HodgePodge.HodgePodge import HodgePodge
 
 # Globals
 client = discord.Client()
 bots = []
+botNames = []
 bots.append(HodgePodge(client))
 botNames.append(bots[0].name.lower())
 
-def helpCmd(channel, m):
+async def helpCmd(channel, m):
     s = re.search("(.*) help with (.*)",m)
     if not s:
         return
@@ -46,10 +47,10 @@ async def on_message(message):
     if(message.author.bot):
         return
     # help
-    helpCmd(message.content)
+    await helpCmd(message.channel, message.content)
     # interact with bots
     for bot in bots:
-        bot.talk(message)
+        await bot.talk(message)
 
 client.run(os.environ.get('BOT_TOKEN'))
 client.close()

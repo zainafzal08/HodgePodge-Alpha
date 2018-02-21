@@ -16,15 +16,18 @@ class Parser():
         self.triggerList = []
     def register(self, module, trigger):
         t = {}
-        t["re"] = re.compile(trigger["trigger"]) #TODO: does this work?
+        t["re"] = re.compile(trigger["trigger"])
         t["f"] = trigger["function"]
         t["l"] = trigger["accessLevel"]
-        if trigger["id"]:
+        if "id" in trigger:
             t["id"] = trigger["id"]
         else:
             t["id"] = None
         t["module"] = module
-        t["ignore"] = trigger["ignore"]
+        if "ignore" in trigger:
+            t["ignore"] = trigger["ignore"]
+        else:
+            t["ignore"] = []
         self.triggerList.append(t)
     def parse(self, m, l):
         m = m.content.lower()
@@ -32,14 +35,14 @@ class Parser():
         for t in self.triggerList:
             cleanedM = m
             for phrase in t["ignore"]:
-                cleanedM = re.sub(phrase,"",cleanedM)
-            attempt = t["re"].search(cleanedM) #TODO: does this work?
+                cleanedM = cleanedM.replace(phrase,"")
+            attempt = t["re"].search(cleanedM)
             if l >= t["l"] and attempt:
                 matches.append(self.createMatch(attempt,t))
         return matches
 
     def createMatch(self,a,t):
         obj = {}
-        obj["args"] = a.groups() #TODO: does this work?
+        obj["args"] = a.groups()
         obj["id"] = t["id"]
-        return Match(t["function"],obj,t["module"].respond)
+        return Match(t["f"],obj,t["module"].respond)

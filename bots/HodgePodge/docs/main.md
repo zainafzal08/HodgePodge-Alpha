@@ -35,3 +35,9 @@ Check out the commands:
 | hodge podge take <X> <T> points from <U> | Same as above but substracts points | `hodge podge take 10 xp points from @AAA`
 | hodge podge list all score points | List all score types (such as xp or goof points) in the current channel | `N/A` |
 | hodge podge summerise <T> points | List all users and their scores (if they have scores) for score type <T> | `hodge podge summerise xp points`
+
+*Option Additions*
+
+For the roll commands i.e `hodge podge roll a d5` you can ask hodge podge to add in a modifier
+`hodge podge roll a d5 +5` or `hodge podge roll 6 d6+2` or `hodge podge roll a d20 - 3`
+spacing doesn't matter just make sure you have a `+` and a number after the dice type
