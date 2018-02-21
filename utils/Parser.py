@@ -8,8 +8,8 @@ class Match():
         self.resF = responseF
     def trigger(self):
         self.f(self.triggerObj)
-    def respond(self, c, ch):
-        self.resF(c,ch)
+    async def respond(self, c, ch):
+        await self.resF(c,ch)
 
 class Parser():
     def __init__(self):
