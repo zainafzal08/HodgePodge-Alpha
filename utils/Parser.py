@@ -1,4 +1,3 @@
-# REMEMER TO TELL MODULES WHEN TRIGGERING THEM OF CLASHES
 import re
 
 class Match():
