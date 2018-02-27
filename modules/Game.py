@@ -12,7 +12,8 @@ class Game(Module):
             ("hodge podge give .* \d+ .* points?\s*$", self.editPoints),
             ("hodge podge take \d+ .* points? from .*\s*$", self.editPoints),
             ("hodge podge list all score types\s*$", self.listPoints),
-            ("hodge podge summerise .* points?\s*$", self.getPoints)
+            ("hodge podge summerise .* points?\s*$", self.getPoints),
+            ("hodge podge give me a name\s*$", self.getName)
         ]
         self.db = db
         self.scoreEditLevel = 0
@@ -78,6 +79,28 @@ class Game(Module):
             res["output"].append(person.name + " now has "+str(new)+" points!")
         return res
 
+    def getName(self, message, level):
+        if level < 0:
+            return
+        vowels = ["a","e","i","o","u"]
+        f = open("words.txt","r")
+        raw = f.read()
+        f.close()
+        l = raw.split("\n")
+        w = l[randint(0,len(l)-1)]
+        a = randint(0,len(w)-1)
+        b = a
+        while a == b:
+        	b = randint(0,len(w))
+        v1 = vowels[randint(0,len(vowels)-1)]
+        v2 = vowels[randint(0,len(vowels)-1)]
+        w = list(w)
+        w.insert(a,v1)
+        w.insert(b,v2)
+        final = "".join(w)
+        res = super().blankRes()
+        res["output"].append("Here's one! %s"%final)
+        return res
     def listPoints(self, message, level):
         if level < self.scoreEditLevel:
             return
