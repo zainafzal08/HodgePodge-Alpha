@@ -1,6 +1,7 @@
 from modules.Module import Module
 import re
 import random
+from random import randint
 from discord.utils import find
 
 class Game(Module):
