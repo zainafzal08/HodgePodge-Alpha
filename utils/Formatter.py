@@ -15,7 +15,7 @@ class Formatter():
     def output(self, s):
         self.buffer.append(s)
     def error(self, s):
-        self.buffer.append("_aww fuck_ i had a error! Let my dads know that: `>> %s`"%s)
+        self.buffer.append("_aww fuck_ %s"%s)
     def list(self, l):
         self.buffer.append("```")
         for e in l:

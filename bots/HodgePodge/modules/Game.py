@@ -17,7 +17,7 @@ class Game(BotModule):
             "accessLevel": 0
             })
         self.triggerList.append({
-            "trigger": "^\s*hodge podge roll (\d+)\s*d(\d)+s?(\s*[\+\-]\s*\d+)?",
+            "trigger": "^\s*hodge podge roll (\d+)\s*d(\d+)s?(\s*[\+\-]\s*\d+)?",
             "function": self.multiRoll,
             "accessLevel": 0
             })
@@ -78,11 +78,13 @@ class Game(BotModule):
             mod = int(re.search("(\d+)",args[2]).group(1))
         elif args[2] and re.search(r"\-",args[2]):
             mod = -1*int(re.search("(\d+)",args[2]).group(1))
+        print(count,d)
         if d > 1000 or count > 1000:
             self.formatter.error("Sorry friend! That number is too big")
             return
         elif d < 1 or count < 1:
-            self.formatter.output("Sorry friend! That number is too small")
+            self.formatter.error("Sorry friend! That number is too small")
+            return
         roll = 0
         components = []
         for i in range(count):
