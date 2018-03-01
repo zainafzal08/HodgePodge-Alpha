@@ -10,7 +10,7 @@ class HodgePodge():
             ("Hodge Podge Wrangler",1),
             ("Robo-Boys",1)
         ]
-        self.name = ""
+        self.name = "hodge podge"
         self.db = Db()
         self.parser = Parser()
         self.client = client

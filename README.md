@@ -48,11 +48,16 @@ You can also add in some optional functions if you so choose
 
 1. getHelp
   - you only need this function if you use the same setup for the reccomended bot getHelp command
-  - this must return a help obj with a list of tuples with 2 fields + 1 optional field under the name "cmds" and a link to a full documentation website/file under "docs". cmds are composed of The command, an description and a optional description.
-  - This will be formatted and sent to a chat if someone types in "<bot name> help with <module name>"
+  - this must return a help obj with 2 field `docs`, a link to full documentation and `raw` a link to the a markdown file which has a `!!start command list` and `!!end command list` wrapped table of commands
+  - if the table exists the bot will extract the list send send it to the request channel. if someone types in "<bot name> help with <module name>"
 
-Then your bot just simply uses the parser to call these modules.
-Take a look at Hodge Podge. My pride and joy
+note with getHelp the table in the raw markdown file must conform to
+
+| Command                                  | Description | Example |
+| ---------------------------------------- | ----------- | ------- |
+| example command                          | ...         | ...     |
+
+Take a look at Hodge Podge. My pride and joy.
 
 ## Utility classes
 

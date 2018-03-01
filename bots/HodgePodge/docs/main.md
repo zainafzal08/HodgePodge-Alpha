@@ -27,6 +27,8 @@ Any more power should only be afforded to development teams.
 The Game module is a little module to roll dice and keep track of points, Lots of fun!
 Check out the commands:
 
+!!start game command list
+
 | Command                                  | Description | Example |
 | ---------------------------------------- | ----------- | ------- |
 | hodge podge roll a d<X>                  | Have hodge podge roll a dice! supports d1 to d1000 | `hodge podge roll a d20`
@@ -35,6 +37,8 @@ Check out the commands:
 | hodge podge take <X> <T> points from <U> | Same as above but substracts points | `hodge podge take 10 xp points from @AAA`
 | hodge podge list all score points | List all score types (such as xp or goof points) in the current channel | `N/A` |
 | hodge podge summerise <T> points | List all users and their scores (if they have scores) for score type <T> | `hodge podge summerise xp points`
+
+!!end game command list
 
 *Option Additions*
 

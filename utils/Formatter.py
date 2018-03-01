@@ -21,3 +21,14 @@ class Formatter():
         for e in l:
             self.buffer.append(" >  %s"%e)
         self.bugger.append("```")
+    def multiList(self, l):
+        self.buffer.append("```")
+        for e in l:
+            self.buffer.append("%-40s >> %s"%(l[0],l[1]))
+        self.buffer.append("```")
+    def getRaw(self):
+        return "\n".join(self.buffer)
+    def clear(self):
+        self.buffer.clear()
+    def getLen(self):
+        return len(self.getRaw())

@@ -8,18 +8,19 @@ class Game(BotModule):
     def __init__(self):
         super().__init__("Game")
         self.scoreEditLevel = 0
+        self.rollLevel = 0
         self.triggerList = []
         self.db = None
         self.formatter = Formatter()
         self.triggerList.append({
             "trigger":"^\s*hodge podge roll a\s*d(\d+)(\s*[\+\-]\s*\d+)?",
             "function":self.roll,
-            "accessLevel": 0
+            "accessLevel": self.rollLevel
             })
         self.triggerList.append({
             "trigger": "^\s*hodge podge roll (\d+)\s*d(\d+)s?(\s*[\+\-]\s*\d+)?",
             "function": self.multiRoll,
-            "accessLevel": 0
+            "accessLevel": self.rollLevel
             })
         self.triggerList.append({
             "trigger": "^\s*hodge podge give (.*) (\d+) (.*) points?",
@@ -57,16 +58,9 @@ class Game(BotModule):
             self.formatter.consoleFlush()
 
     def getHelp(self):
-        res = []
-        res.append(("hodge podge roll a d<X>","Have hodge podge roll a dice! supports d1 to d1000. You can also add a `+4` or `-1` etc. to the end for modifiers","hodge podge roll a d20 +1"))
-        res.append(("hodge podge roll <Y> d<X>s","Have hodge podge roll a dice Y times! supports up to 1000 d1000. Also supports modifiers like a single dice roll.","hodge podge roll 3 d8's"))
-        res.append(("hodge podge give <U> <X> <T> points","Gives a user <U> (should be a @ tag) <X> points of <T>","hodge podge give @AAA 10 xp points"))
-        res.append(("hodge podge take <X> <T> points from <U>","Same as above but substracts points","hodge podge take 10 xp points from @AAA"))
-        res.append(("hodge podge list all score points","List all score types (such as xp or goof points) in the current channel",None))
-        res.append(("hodge podge summerise <T> points","List all users and their scores (if they have scores) for score type <T>","hodge podge summerise xp points"))
         obj = {}
-        obj["cmds"] = res
         obj["docs"] = "https://github.com/zainafzal08/HodgePodge/blob/dev/bots/HodgePodge/docs/main.md#game"
+        obj["raw"] = "https://raw.githubusercontent.com/zainafzal08/HodgePodge/dev/bots/HodgePodge/docs/main.md#game"
         return obj
 
     def multiRoll(self, trigger):
@@ -78,7 +72,6 @@ class Game(BotModule):
             mod = int(re.search("(\d+)",args[2]).group(1))
         elif args[2] and re.search(r"\-",args[2]):
             mod = -1*int(re.search("(\d+)",args[2]).group(1))
-        print(count,d)
         if d > 1000 or count > 1000:
             self.formatter.error("Sorry friend! That number is too big")
             return
