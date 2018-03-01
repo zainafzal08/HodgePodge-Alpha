@@ -5,12 +5,16 @@ import os
 class Db():
     def __init__(self):
         url = urlparse.urlparse(os.environ['DATABASE_URL'])
-        dbname = url.path[1:]
-        user = url.username
-        password = url.password
-        host = url.hostname
-        port = url.port
-        self.conn = psycopg2.connect(dbname=dbname,user=user,password=password,host=host,port=port)
+        self.dbname = url.path[1:]
+        self.user = url.username
+        self.password = url.password
+        self.host = url.hostname
+        self.port = url.port
+        self.conn = psycopg2.connect(dbname=self.dbname,user=self.user,password=self.password,host=self.host,port=self.port)
+
+    def reboot(self):
+        self.conn.close()
+        self.conn = psycopg2.connect(dbname=self.dbname,user=self.user,password=self.password,host=self.host,port=self.port)
 
     def fetchAll(self, c):
         curr = c.fetchone()

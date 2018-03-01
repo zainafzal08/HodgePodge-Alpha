@@ -132,7 +132,10 @@ async def on_message(message):
     # ignore bots
     if(message.author.bot):
         return
-
+    if message.content.lower().strip() == "hodge podge reboot database":
+        db.reboot()
+        await client.send_message(message.channel, "Rebooted.")
+        return
     # trigger modules
     raw = message.content
     level = accessLevel(message.channel, message.author)
