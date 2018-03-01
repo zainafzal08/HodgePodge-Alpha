@@ -52,6 +52,8 @@ async def helpCmd(channel, m):
 
     if cmds:
         f.output("Here's some of the commands you can use with that module!")
+        for i in range(len(cmds)):
+            cmds[i] = (cmds[i][0],cmds[i][1],("ex",cmds[i][2]))
         f.multiList(cmds)
     if docMessage:
         f.output(docMessage)

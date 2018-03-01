@@ -13,34 +13,34 @@ class Game(BotModule):
         self.db = None
         self.formatter = Formatter()
         self.triggerList.append({
-            "trigger":"^\s*hodge podge roll a\s*d(\d+)(\s*[\+\-]\s*\d+)?",
+            "trigger":"^\s*hodge\s*podge roll a\s*d(\d+)(\s*[\+\-]\s*\d+)?",
             "function":self.roll,
             "accessLevel": self.rollLevel
             })
         self.triggerList.append({
-            "trigger": "^\s*hodge podge roll (\d+)\s*d(\d+)s?(\s*[\+\-]\s*\d+)?",
+            "trigger": "^\s*hodge\s*podge roll (\d+)\s*d(\d+)s?(\s*[\+\-]\s*\d+)?",
             "function": self.multiRoll,
             "accessLevel": self.rollLevel
             })
         self.triggerList.append({
-            "trigger": "^\s*hodge podge give (.*) (\d+) (.*) points?",
+            "trigger": "^\s*hodge\s*podge give (.*) (\d+) (.*) points?",
             "function": self.editPoints,
             "accessLevel": self.scoreEditLevel,
             "id": 0
             })
         self.triggerList.append({
-            "trigger": "^\s*hodge podge take (\d+) (.*) points? from (.*)",
+            "trigger": "^\s*hodge\s*podge take (\d+) (.*) points? from (.*)",
             "function": self.editPoints,
             "accessLevel": self.scoreEditLevel,
             "id": 1
             })
         self.triggerList.append({
-            "trigger": "^\s*hodge podge list all score types",
+            "trigger": "^\s*hodge\s*podge list all score types",
             "function": self.listPoints,
             "accessLevel": self.scoreEditLevel
             })
         self.triggerList.append({
-            "trigger": "^\s*hodge podge summerise (.*) points?",
+            "trigger": "^\s*hodge\s*podge summerise (.*) points?",
             "function": self.getPoints,
             "accessLevel": self.scoreEditLevel
             })

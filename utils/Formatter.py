@@ -26,7 +26,10 @@ class Formatter():
         for e in l:
             self.buffer.append("%s"%e[0])
             for subE in e[1:]:
-                self.buffer.append("    >> %s"%subE)
+                if type(subE) is tuple:
+                    self.buffer.append("    %s %s"%(subE[0],subE[1]))
+                else:
+                    self.buffer.append("    >> %s"%subE)
 
         self.buffer.append("```")
     def getRaw(self):
