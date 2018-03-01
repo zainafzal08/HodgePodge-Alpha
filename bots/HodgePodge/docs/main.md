@@ -31,17 +31,17 @@ Check out the commands:
 
 | Command                                  | Description | Example |
 | ---------------------------------------- | ----------- | ------- |
-| hodge podge roll a d<X>                  | Have hodge podge roll a dice! supports d1 to d1000 | `hodge podge roll a d20`
-| hodge podge roll <Y> d<X>s               | Have hodge podge roll a dice Y times! supports up to 1000 d1000 | `hodge podge roll 3 d8's`
-| hodge podge give <U> <X> <T> points      | Gives a user <U> (should be a @ tag) <X> points of <T> | `hodge podge give @AAA 10 xp points`
-| hodge podge take <X> <T> points from <U> | Same as above but substracts points | `hodge podge take 10 xp points from @AAA`
-| hodge podge list all score points | List all score types (such as xp or goof points) in the current channel | `N/A` |
-| hodge podge summerise <T> points | List all users and their scores (if they have scores) for score type <T> | `hodge podge summerise xp points`
+| hodge podge roll a d<X>                  | Have hodge podge roll a dice! supports d1 to d1000 | hodge podge roll a d20 |
+| hodge podge roll <Y> d<X>s               | Have hodge podge roll a dice Y times! supports up to 1000 d1000 | hodge podge roll 3 d8's |
+| hodge podge give <U> <X> <T> points      | Gives a user <U> (should be a @ tag) <X> points of <T> | hodge podge give @AAA 10 xp points |
+| hodge podge take <X> <T> points from <U> | Same as above but substracts points | hodge podge take 10 xp points from @AAA |
+| hodge podge list all score points | List all score types (such as xp or goof points) in the current channel | N/A |
+| hodge podge summerise <T> points | List all users and their scores (if they have scores) for score type <T> | hodge podge summerise xp points |
 
 !!end game command list
 
 *Option Additions*
 
-For the roll commands i.e `hodge podge roll a d5` you can ask hodge podge to add in a modifier
-`hodge podge roll a d5 +5` or `hodge podge roll 6 d6+2` or `hodge podge roll a d20 - 3`
+For the roll commands i.e hodge podge roll a d5` you can ask hodge podge to add in a modifier
+hodge podge roll a d5 +5` or hodge podge roll 6 d6+2` or hodge podge roll a d20 - 3`
 spacing doesn't matter just make sure you have a `+` and a number after the dice type

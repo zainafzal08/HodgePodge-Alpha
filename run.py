@@ -5,7 +5,7 @@ import re
 from bots.HodgePodge.HodgePodge import HodgePodge
 from utils import TableExtracter
 from utils.Formatter import Formatter
-
+import requests
 # Globals
 client = discord.Client()
 
@@ -33,9 +33,10 @@ async def helpCmd(channel, m):
     docs = helpObj.get("docs",None)
     if "raw" in helpObj:
         try:
-            cmd = TableExtracter.extract(requests.get(helpObj["raw"]).text,requestMod)
-        except:
-            cmd = None
+            cmds = TableExtracter.extract(requests.get(helpObj["raw"]).text,requestMod)
+        except Exception as e:
+            cmds = None
+            raise e
     # handle errors
     if not docs and cmds:
         tooLongMessage = "There are a tad too many commands in that module for me to give you here!"
@@ -51,8 +52,7 @@ async def helpCmd(channel, m):
 
     if cmds:
         f.output("Here's some of the commands you can use with that module!")
-        cmds = list(map(formatCmd,cmds))
-        f.list(cmds)
+        f.multiList(cmds)
     if docMessage:
         f.output(docMessage)
     messLen = f.getLen()
@@ -60,15 +60,6 @@ async def helpCmd(channel, m):
         f.clear()
         f.output(tooLongMessage)
     await f.flush(client, channel)
-
-def formatCmd(e):
-    if len(e) == 0:
-        return (e[0],"")
-    if e[2][0] == "`" and e[2][-1] == "`":
-        desc = "%s (%s)"%(e[1],e[2][1:-1])
-    else:
-        desc = "%s (%s)"%(e[1],e[2])
-    return (e[0],desc)
 
 @client.event
 async def on_ready():

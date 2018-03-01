@@ -24,7 +24,10 @@ class Formatter():
     def multiList(self, l):
         self.buffer.append("```")
         for e in l:
-            self.buffer.append("%-40s >> %s"%(l[0],l[1]))
+            self.buffer.append("%s"%e[0])
+            for subE in e[1:]:
+                self.buffer.append("    >> %s"%subE)
+
         self.buffer.append("```")
     def getRaw(self):
         return "\n".join(self.buffer)
