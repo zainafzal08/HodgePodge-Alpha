@@ -132,13 +132,15 @@ async def on_message(message):
     # ignore bots
     if(message.author.bot):
         return
-    if message.content.lower().strip() == "hodge podge reboot database":
+    raw = message.content
+    level = accessLevel(message.channel, message.author)
+
+    # reboot
+    if raw.lower().strip() == "hodge podge reboot database" and level > 1:
         db.reboot()
         await client.send_message(message.channel, "Rebooted.")
         return
     # trigger modules
-    raw = message.content
-    level = accessLevel(message.channel, message.author)
     for module in modules:
         try:
             res = module.trigger(message, level)
