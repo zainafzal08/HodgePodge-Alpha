@@ -1,19 +1,42 @@
 from utils.Response import Response
 from utils.Parser import Parser
+from utils.Response import Response
+import inspect
 
 class HodgePodge():
     def __init__(self):
         self.modules = []
         self.parser = Parser()
+
+    def callAll(obj):
+        for name in dir(obj):
+            attribute = getattr(obj, name)
+            if ismethod(attribute):
+                attribute(*args, **kwargs)
     def attachModule(self, m):
         self.modules.append(m)
         m.connectParser(self.parser)
+        self.flushModule(m)
 
-    # the message as a string
-    # the level of the user
-    # the location id of the sent message
-    def talk(self, message, level, locationId):
-        r = Response()
-        r.textResponce("I'm Hodge Podge!",locationId)
-        self.modules[0].roll()
-        return r
+    # ok now i admit. this is a hacky way to do this **BUT**
+    # unless someone else makes a function called wrapped_f
+    # i should be safe....
+    def flushModule(self, m):
+        for member in inspect.getmembers(m):
+            if inspect.ismethod(member[1]):
+                if member[1].__name__ == "wrapped_f":
+                    member[1].__call__()
+
+    def processRequest(response, request):
+        pass
+
+    def talk(self, message, roles, locationId):
+        # Doesn't handle any clashes, overrides.
+        match = self.parser.parse(message,roles,locationId)
+        if not match:
+            return None
+        r = match.trigger()
+        response = r[0]
+        if r[1]:
+            self.processRequest(response, r[1])
+        return response

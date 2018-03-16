@@ -25,7 +25,8 @@ class TestInterface():
                 print("[ %s"%r)
             else:
                 res = self.boy.talk(l,self.level,self.location)
-                print("@ %s >> %s"%(res.getTextTarget(), res.getTextMsg()))
+                if res:
+                    print("@ %s >> %s"%(res.getTextTarget(), res.getTextMsg()))
             if self.running:
                 l = self.getLine()
     def getLine(self):

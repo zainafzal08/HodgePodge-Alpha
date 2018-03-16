@@ -6,7 +6,8 @@ class Trigger():
 	def __call__(self,f,**args):
 		def wrapped_f(*args):
 			if not self.initalised:
-				args[0].getParser().register(args[0],self.regex,self.access)
+				args[0].getParser().register(args[0],self.regex,self.access,f.__name__)
 				self.initalised = True
-			f(*args)
+			else:
+				return f(*args)
 		return wrapped_f
