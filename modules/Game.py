@@ -28,7 +28,7 @@ class Game(Module):
         res = Response()
         result = random.randint(1,diceType)
         res.textResponce("I Got %d!"%result,context["locationId"],"output")
-        return (res,None)
+        return res
 
     @Trigger('hodge podge.*roll[^\d]*(\d+)[^d]*d\s*(\-?\d+)',[],["diceNumCheck","diceCheck"])
     def multiroll(self, context):
@@ -48,4 +48,4 @@ class Game(Module):
         if len(rollStr) + len(componentStr) < 2000:
             rollStr += componentStr
         res.textResponce(rollStr,context["locationId"],"out")
-        return (res,None)
+        return res
