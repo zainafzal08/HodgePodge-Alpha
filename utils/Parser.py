@@ -19,7 +19,7 @@ class Match():
         valid = True
         err = None
         for i,g in enumerate(self.context["groups"]):
-            if i < len(self.validation) and not self.validation[i][0](g):
+            if i < len(self.validation) and self.validation[i] and not self.validation[i][0](g):
                 valid = False
                 err = self.validation[i][1]
         if valid:
