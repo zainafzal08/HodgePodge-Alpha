@@ -1,8 +1,10 @@
+from utils.Response import Response
+
 class Formatter():
     def __init__(self):
         self.buffer = []
     def output(self, s):
-        self.buffer.append(s)
+        self.bugger.append(s)
     def error(self, s):
         self.buffer.append("_aww fuck_ %s"%s)
     def list(self, l):
@@ -23,6 +25,10 @@ class Formatter():
     def generate(self):
         o = "\n".join(self.buffer)
         return o
+    def generateResponse(self):
+        res = Response()
+        res.textResponce(rollStr,context["locationId"],"out")
+        return res
     def clear(self):
         self.buffer.clear()
     def getLines(self):

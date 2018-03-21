@@ -1,7 +1,9 @@
 import re
+from utils.Response import Response
 
 class Match():
-    def __init__(self, m, rgx, acs,f):
+
+    def __init__(self, m, rgx, acs,f,v):
         self.module = m
         self.regex = re.compile(rgx)
         self.access = acs
@@ -11,16 +13,29 @@ class Match():
         self.context["locationId"] = None
         self.context["raw"] = None
         self.context["userRoles"] = None
+        self.validation = list(map(lambda x: getattr(m,x),v))
+
     def trigger(self):
-        return getattr(self.module,self.function)(self.context)
+        valid = True
+        err = None
+        for i,g in enumerate(self.context["groups"]):
+            if i < len(self.validation) and not self.validation[i][0](g):
+                valid = False
+                err = self.validation[i][1]
+        if valid:
+            return getattr(self.module,self.function)(self.context)
+        else:
+            res = Response()
+            res.textResponce("Sorry! %s"%err,self.context["locationId"],"err")
+            return (res,None)
 
 class Parser():
     def __init__(self):
         self.triggers = []
         pass
 
-    def register(self, m, rgx, acs, f):
-        match = Match(m,rgx,acs,f)
+    def register(self, m, rgx, acs, f, v):
+        match = Match(m,rgx,acs,f, v)
         self.triggers.append(match)
 
     def permission(self, roles, access):

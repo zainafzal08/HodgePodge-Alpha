@@ -63,7 +63,7 @@ def roll(self, context):
 1. hodge podge processRequest + erroring
 2. parser module clash handling
 3. formatter/erroring
-4.
+4. make better paramater checking system (built into parser?)
 
 #### Features
 - voice Channel + Google Module

@@ -8,11 +8,6 @@ class HodgePodge():
         self.modules = []
         self.parser = Parser()
 
-    def callAll(obj):
-        for name in dir(obj):
-            attribute = getattr(obj, name)
-            if ismethod(attribute):
-                attribute(*args, **kwargs)
     def attachModule(self, m):
         self.modules.append(m)
         m.connectParser(self.parser)
