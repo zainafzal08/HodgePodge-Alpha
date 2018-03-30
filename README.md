@@ -95,3 +95,4 @@ def roll(self, context):
 - give option to validate hodge podge
 - let people roll dice with adjectives
 - remember command
+- markcov chains -> conversations
