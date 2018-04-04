@@ -88,6 +88,7 @@ async def playAudio(message, url):
         vc = await client.join_voice_channel(voice_channel)
 
     player = await vc.create_ytdl_player(url)
+    player.volume = 0.1
     player.start()
 
 async def audioVol(message, vol):
