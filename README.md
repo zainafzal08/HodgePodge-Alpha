@@ -3,7 +3,7 @@
 A small discord bot to be sweet, keep track of Dnd rescoures, send memes and help you search spells.
 Inspired by TAZ!
 
-Hosted with <3 on Heroku
+Hosted with lots of <3 on Heroku
 
 ## TODO
 
